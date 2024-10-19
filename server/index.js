@@ -26,8 +26,131 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME,
 });
 
-// JWT Secret
-// const JWT_SECRET = process.env.JWT_SECRET;
+
+//to get all the unliked recipe
+app.get('/api/recipes', async (req, res) => {
+  try {
+    const [results] = await pool.query('SELECT * FROM recipe WHERE Liked=0 LIMIT 100');
+    res.json(results);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+});
+
+//to get liked recipe
+app.get('/api/recipes/liked', async (req, res) => {
+  try {
+    const [results] = await pool.query('SELECT * FROM recipe WHERE Liked=1');
+    res.json({
+      count:results.length,
+      data:results,
+    });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+});
+
+//to get all search item
+app.get('/api/recipes/search/:query', async (req, res) => {
+  const { query } = req.params; // Get the search term from the URL parameter
+  
+  if (!query || query.trim() === '') {
+    return res.status(400).json({ error: 'Invalid search query' });
+  }
+
+  try {
+    // Construct the search query to match the keyword in name, description, or ingredients
+    const searchQuery = `
+      SELECT * 
+      FROM recipe 
+      WHERE name LIKE ? AND Liked=0
+    `;
+
+    // Use wildcards for partial matching
+    const searchPattern = `%${query}%`;
+
+    // Log the query for debugging purposes
+    // console.log(`Executing search query with: ${searchPattern}`);
+
+    // Execute the query with the search term
+    const [results] = await pool.query(searchQuery, [searchPattern]);
+    // If no results are found, return a 404
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'No recipes found' });
+    }
+
+    // Return the search results
+    res.json(results);
+  } catch (error) {
+    console.error('Error during search:', error.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+//to update liked recipe
+app.put('/api/recipes/addlike/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // First, check the current liked status
+    const [currentStatus] = await pool.execute('SELECT liked FROM recipe WHERE id = ?', [id]);
+    
+    if (currentStatus.length > 0) {
+      const currentLiked = currentStatus[0].liked;
+
+      // Only update if the current liked status is 0
+      if (currentLiked === 0) {
+        const [result] = await pool.execute('UPDATE recipe SET liked = ? WHERE id = ?', [1, id]);
+        
+        if (result.affectedRows > 0) {
+          return res.json({ message: 'Recipe liked status updated to 1' });
+        } else {
+          return res.status(404).json({ error: 'Recipe not found' });
+        }
+      } else {
+        return res.status(400).json({ error: 'Recipe already liked' });
+      }
+    } else {
+      return res.status(404).json({ error: 'Recipe not found' });
+    }
+  } catch (error) {
+    console.error('Error updating recipe:', error);
+    res.status(500).json({ error: 'Error updating recipe' });
+  }
+});
+
+//to update unliked recipe
+app.put('/api/recipes/unlike/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // First, check the current liked status
+    const [currentStatus] = await pool.execute('SELECT liked FROM recipe WHERE id = ?', [id]);
+    
+    if (currentStatus.length > 0) {
+      const currentLiked = currentStatus[0].liked;
+
+      // Only update if the current liked status is 0
+      if (currentLiked === 1) {
+        const [result] = await pool.execute('UPDATE recipe SET liked = ? WHERE id = ?', [0, id]);
+        
+        if (result.affectedRows > 0) {
+          return res.json({ message: 'Recipe liked status updated to 0' });
+        } else {
+          return res.status(404).json({ error: 'Recipe not found' });
+        }
+      } else {
+        return res.status(400).json({ error: 'Recipe already liked' });
+      }
+    } else {
+      return res.status(404).json({ error: 'Recipe not found' });
+    }
+  } catch (error) {
+    console.error('Error updating recipe:', error);
+    res.status(500).json({ error: 'Error updating recipe' });
+  }
+});
 
 // User sign-in route
 app.post('/sign_in', async (req, res) => {

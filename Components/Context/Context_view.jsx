@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState,useEffect } from 'react';
 import { Food } from '../../Data/Data';
-
+import axios from 'axios';
 // Create context
 const viewContext = createContext();
 
@@ -8,40 +8,65 @@ const viewContext = createContext();
 const useViewContext = () => useContext(viewContext);
 
 const ViewProvider = ({ children }) => {
-  const [count, SetCount] = useState(0);
-  const [item, AddItem] = useState([]);
+  const [count, setCount] = useState(0);
+  const [Recipe,setRecipe]=useState([]); // for all recipe to show in or recipe
+  const [Favourite,setFavourite]=useState([]);//for all liked recipe
+  const [item,setItem] =useState(0);//number of recipe in favourite
+  const [searchUrl,setsearchUrl] =useState('http://localhost:3081/api/recipes');
+
+   const fetchSearch=(query)=>{
+         if(query){
+          setsearchUrl(`http://localhost:3081/api/recipes/search/${query}`)
+         }
+         else{
+          setsearchUrl('http://localhost:3081/api/recipes')
+         }
+         setCount(prevCount => prevCount + 1);
+    }
+
+  //to show all the recipe in ourrecipe
+  useEffect(() => {
+    Promise.all([
+      //for all unliked recipe
+      axios.get(searchUrl),
+      //for all liked recipe
+      axios.get('http://localhost:3081/api/recipes/liked'),
+    ])
+      .then(([response_first,response_second]) => {
+        setRecipe(response_first.data);
+        const {count:number_item, data:recipe_data}=response_second.data;
+        setItem(number_item);
+        setFavourite(recipe_data);
+      })
+      .catch((error) => {
+        console.error('Error fetching recipes:', error);
+      });
+  }, [count]);
 
   // Function to handle adding items to the cart
   const handleAdd = (id) => {
-  
-
-  // Find the item by its id
-  const cartItem = Food.find((elem) => elem.id === id);
-
-  if (cartItem) {
-    // Check if the item is already in the cart
-    AddItem((prevItems) => {
-      const isItemInCart = prevItems.some(item => item.id === id);
-      if (!isItemInCart) {
-        SetCount(count + 1);
-        return [...prevItems, cartItem];
-      }
-      return prevItems;
-    });
-  }
+   axios.put(`http://localhost:3081/api/recipes/addlike/${id}`)
+          .then(response => {
+            console.log('Item liked status set to 1:', response.data);
+            setCount(prevCount => prevCount + 1);
+          })
+          .catch(error => {
+            console.error('Error updating liked status:', error);
+          });
 };
 
 const handleRemove = (id) => {
-  // Remove the item by its id
-  SetCount(count-1);
-  AddItem((prevItems) => prevItems.filter(item => item.id !== id));
+  axios.put(`http://localhost:3081/api/recipes/unlike/${id}`)
+          .then(response => {
+            console.log('Item liked status set to 0:', response.data);
+            setCount(prevCount => prevCount + 1);
+          })
+          .catch(error => {
+            console.error('Error updating liked status:', error);
+          });
 };
 
-const isInCart = (id) => {
-    return item.some(cartItem => cartItem.id === id);
-  };
-
-  const allValue = { count, SetCount, handleAdd, item, AddItem,handleRemove,isInCart};
+  const allValue = { fetchSearch,Favourite, Recipe, item, handleAdd,handleRemove};
 
   return (
     <viewContext.Provider value={allValue}>

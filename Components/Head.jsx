@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTypewriter, Cursor } from 'react-simple-typewriter';
 import { GiFastBackwardButton,GiFastForwardButton } from "react-icons/gi";
+
 const Head = () => {
   const images = [
     {

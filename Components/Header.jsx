@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { FaCartShopping } from "react-icons/fa6";
 import { GiHamburgerMenu } from "react-icons/gi";
+import { FaBookOpen } from "react-icons/fa";
 import { RxCross1 } from "react-icons/rx";
 import { Link } from 'react-router-dom';
 import { useViewContext } from './Context/Context_view';
 
 const Header = () => {
 
-    const {count}=useViewContext();
+    const {item}=useViewContext();
 
     const [sideNav, setSideNav] = useState(false);
     
@@ -26,7 +27,7 @@ const Header = () => {
                         <p className="hover:text-blue-500 text-[20px] font-bold">Home</p>
                     </Link>
                     <Link to="/About">
-                        <p className="hover:text-blue-500 text-[20px] font-bold">About</p>
+                        <p className="hover:text-blue-500 text-[20px] font-bold">About Us</p>
                     </Link>
                     <Link to="/OurFood">
                         <p className="hover:text-blue-500 text-[20px] font-bold">Our Recipe</p>
@@ -37,9 +38,9 @@ const Header = () => {
                 </div>
                 <div className="flex gap-5 items-center">
                     <GiHamburgerMenu size={30} className="cursor-pointer sm:hidden" onClick={handleChange} />
-                    <p className='absolute top-1 right-10'>{count}</p>
+                    <p className='absolute top-1 right-10'>{item}</p>
                     <Link to="/viewReceipe">
-                      <FaCartShopping size={30} className='mx-5'/>
+                      <FaBookOpen size={30} className='mx-5'/>
                     </Link>
                 </div>
             </div>
@@ -53,7 +54,7 @@ const Header = () => {
                                 <li className="hover:text-blue-500">Home</li>
                             </Link>
                             <Link to="/About" onClick={handleChange}>
-                                <li className="hover:text-blue-500">About</li>
+                                <li className="hover:text-blue-500">About Us</li>
                             </Link>
                             <Link to="/OurFood" onClick={handleChange}>
                                 <li className="hover:text-blue-500">Our Recipe</li>

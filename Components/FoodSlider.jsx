@@ -5,7 +5,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useViewContext } from './Context/Context_view';
 const FoodSlider = () => {
-  const {handleAdd,isInCart}=useViewContext();
+  const {handleAdd,Favourite,Recipe}=useViewContext();
   const settings = {
     dots: true,
     infinite: true,
@@ -48,24 +48,18 @@ const FoodSlider = () => {
       <h2 className='font-bold text-3xl text-center'>What's On Your Mind?</h2>
       <div className='py-20 justify-center items-center'>
       <Slider {...settings}>
-         {
-            Food.map((item,i)=>(
-               <div className='bg-[white] pt-8 h-[60vh] mx-auto' key={item.id}>
-                  <div className=' flex justify-center items-center rounded-t-xl'>
-                  <img src={item.image}
-                   className='w-[30vh] h-[30vh] rounded-full object-cover'
-                    alt=" food item "/>
-                  </div>
-                  <div className='flex flex-col justify-center items-center gap-2 p-4'>
-                  <p className='text-[14px] font-semibold uppercase'>{item.name}</p>
-                  <p className='text-[15px] font-semibold uppercase'>${item.calories.replace('kcal', '')}</p>
-                  <button className=' bg-blue-500 w-[100px] text-white rounded-md my-6 py-[10px] text-[15px] font-bold hover:text-black' onClick={()=>handleAdd(item.id)}>
-                   {isInCart(item.id) ? 'Added' : 'Add to cart'}
-                  </button>
-                  </div>
-               </div>
-            ))
-         }
+         {Favourite.slice(0,13).map((item) => (
+            <div key={item.id} className='justify-center px-2'>
+              <img src={item.image_url} alt={item.name} className='w-full h-48 rounded-lg object-contain' />
+              <div className='flex justify-center py-2 px-4 flex-col items-center'>
+                <p className='text-[20px] line-clamp-2'>{item.name}</p>
+                <p>{item.prep_time}</p>
+                <button className='bg-black w-[100px] text-white rounded-md my-6 py-[10px] text-[15px] hover:text-yellow-500' onClick={()=>handleAdd(item.id)}>
+                    Added
+                </button>
+              </div>
+            </div>
+          ))}
          </Slider>
         </div>
       </div>
