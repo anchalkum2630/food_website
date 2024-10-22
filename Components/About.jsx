@@ -1,4 +1,5 @@
 import React from 'react';
+import FoodData from './FoodData';
 
 const AboutUs = () => {
   return (
@@ -34,6 +35,7 @@ const AboutUs = () => {
         </div>
       </div>
     </div>
+    <FoodData/>
     </div>
   );
 };

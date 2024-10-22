@@ -75,10 +75,39 @@ app.get('/api/recipes/search/:query', async (req, res) => {
     // Execute the query with the search term
     const [results] = await pool.query(searchQuery, [searchPattern]);
     // If no results are found, return a 404
-    if (results.length === 0) {
-      return res.status(404).json({ error: 'No recipes found' });
-    }
+    // if (results.length === 0) {
+    //   return res.status(404).json({ error: 'No recipes found' });
+    // }
 
+    // Return the search results
+    res.json(results);
+  } catch (error) {
+    console.error('Error during search:', error.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+//to see the click item
+app.get('/api/recipes/search/detail/:query', async (req, res) => {
+  const { query } = req.params; // Get the search term from the URL parameter
+  
+  if (!query || query.trim() === '') {
+    return res.status(400).json({ error: 'Invalid search query' });
+  }
+
+  try {
+    // Construct the search query to match the keyword in name, description, or ingredients
+    const searchQuery = `
+      SELECT * 
+      FROM recipe 
+      WHERE id LIKE ? 
+    `;
+
+    // Use wildcards for partial matching
+    // const searchPattern = `%${query}%`;
+
+    // Execute the query with the search term
+    const [results] = await pool.query(searchQuery, [query]);
     // Return the search results
     res.json(results);
   } catch (error) {

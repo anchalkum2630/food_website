@@ -1,8 +1,9 @@
 import React from 'react'
 import { useViewContext } from './Context/Context_view';
+import FoodData from './FoodData';
 
 const ViewReceipe = () => {
-  const {handleRemove,Favourite}=useViewContext();
+  const {handleRemove,Favourite,close,handleData}=useViewContext();
   if (!Favourite || Favourite.length === 0) {
     return <p className='w-[90%] mx-auto mt-44 mb-48 text-center text-3xl'>No recipes found.</p>;
   }
@@ -11,7 +12,7 @@ const ViewReceipe = () => {
       <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-4'>
       {Favourite.map((item) => (
             <div key={item.id} className='justify-center'>
-              <img src={item.image_url} alt={item.name} className='w-full h-48 rounded-lg object-contain' />
+              <img src={item.image_url} alt={item.name} className='w-full h-48 rounded-lg object-contain' onClick={()=>handleData(item.id)} />
               <div className='flex justify-center py-2 px-4 flex-col items-center'>
                 <p className='text-[20px] line-clamp-2'>{item.name}</p>
                 <p>{item.prep_time}</p>
@@ -22,6 +23,7 @@ const ViewReceipe = () => {
             </div>
           ))}
     </div>
+    {close && <FoodData/>}
     </div>
   )
 }

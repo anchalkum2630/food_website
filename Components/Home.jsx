@@ -2,6 +2,7 @@ import React from 'react'
 import Head from './Head'
 import Delivery from './Delivery'
 import FoodSlider from './FoodSlider'
+import FeedBack from './FeedBack'
 
 const Home = () => {
   return (
@@ -9,6 +10,7 @@ const Home = () => {
       <Head/>
       <Delivery/>
       <FoodSlider/>
+      <FeedBack/>
     </div>
   )
 }

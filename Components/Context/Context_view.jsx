@@ -13,6 +13,8 @@ const ViewProvider = ({ children }) => {
   const [Favourite,setFavourite]=useState([]);//for all liked recipe
   const [item,setItem] =useState(0);//number of recipe in favourite
   const [searchUrl,setsearchUrl] =useState('http://localhost:3081/api/recipes');
+  const [foodDetail,setFooddetail]=useState({});
+  const [close, setClose] = useState(false);
 
    const fetchSearch=(query)=>{
          if(query){
@@ -55,6 +57,25 @@ const ViewProvider = ({ children }) => {
           });
 };
 
+//to search the full data about recipe
+const handleData = (id) => {
+   axios.get(`http://localhost:3081/api/recipes/search/detail/${id}`)
+          .then(response => {
+            console.log(response.data)
+            setFooddetail(response.data);
+            setClose(true)
+          })
+          .catch(error => {
+            console.error('Error in searching:', error);
+          });
+};
+
+//in fooddata close button works as 
+const onClose = () => {
+    setFooddetail({});
+    setClose(false);
+  };
+
 const handleRemove = (id) => {
   axios.put(`http://localhost:3081/api/recipes/unlike/${id}`)
           .then(response => {
@@ -66,7 +87,7 @@ const handleRemove = (id) => {
           });
 };
 
-  const allValue = { fetchSearch,Favourite, Recipe, item, handleAdd,handleRemove};
+  const allValue = { fetchSearch, Favourite, Recipe, item, handleAdd, handleRemove, handleData, foodDetail, onClose,close};
 
   return (
     <viewContext.Provider value={allValue}>

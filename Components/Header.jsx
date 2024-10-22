@@ -32,11 +32,11 @@ const Header = () => {
                     <Link to="/OurFood">
                         <p className="hover:text-blue-500 text-[20px] font-bold">Our Recipe</p>
                     </Link>
-                    <Link to="/SignIn">
-                        <p className="hover:text-blue-500 text-[20px] font-bold">Sign In</p>
-                    </Link>
                 </div>
                 <div className="flex gap-5 items-center">
+                    <Link to="/SignIn">
+                        <p className="hidden sm:flex hover:text-blue-500 text-[20px] font-bold">Sign In</p>
+                    </Link>
                     <GiHamburgerMenu size={30} className="cursor-pointer sm:hidden" onClick={handleChange} />
                     <p className='absolute top-1 right-10'>{item}</p>
                     <Link to="/viewReceipe">
