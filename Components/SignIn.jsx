@@ -57,7 +57,7 @@ const SignIn = () => {
   };
 
   return (
-    <div className='mt-20'>
+    <div className='mt-36 h-[100vh]'>
     <div className="w-full max-w-md mx-auto p-6 bg-white shadow-md shadow-black rounded-lg my-10 ">
       <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Sign In</h2>
       <form onSubmit={handleSubmit} className="space-y-4">

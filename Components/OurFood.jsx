@@ -37,7 +37,7 @@ if (Recipe.length === 0) {
 
   return (
     <>
-      <div className='w-[90%] mx-auto mt-20'>
+      <div className='w-[90%] m-auto mt-20'>
         <div className='flex justify-between'>
           <h2 className='text-center text-yellow-500 text-3xl font-bold py-5'>Our Recipe</h2>
           <input
@@ -53,8 +53,8 @@ if (Recipe.length === 0) {
 
         <div className='grid sm:grid-cols-2 lg:grid-cols-4 gap-4'>
           {Recipe.map((item) => (
-            <div key={item.id} className='justify-center'>
-              <img src={item.image_url} alt={item.name} className='w-[90%] h-48 rounded-lg image-resize' onClick={()=>handleData(item.id)} />
+            <div key={item.id} className='justify-center group'>
+              <img src={item.image_url} alt={item.name} className='w-[90%] h-48 rounded-lg image-resize mx-auto transform transition-transform duration-300 group-hover:scale-110' onClick={()=>handleData(item.id)} />
               <div className='flex justify-center py-2 px-4 flex-col items-center'>
                 <p className='text-[20px] line-clamp-1'>{item.name}</p>
                 <p className='text-blue-500 mt-2' >{item.prep_time}</p>                  

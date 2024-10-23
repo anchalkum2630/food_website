@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { FaCartShopping } from "react-icons/fa6";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaBookOpen } from "react-icons/fa";
 import { RxCross1 } from "react-icons/rx";
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBowlRice } from '@fortawesome/free-solid-svg-icons';
 import { useViewContext } from './Context/Context_view';
 
 const Header = () => {
@@ -20,7 +21,7 @@ const Header = () => {
         <header className="fixed top-0 left-0 w-full px-4 py-4 bg-white shadow-md z-50">
             <div className="flex justify-between items-center">
                 <div className="font-bold text-[20px]">
-                    <p className='text-[25px]'>Yum<span className="text-blue-500">Receipe</span></p>
+                    <p className='text-[25px]'>Yum<span className="text-blue-500">Receipe <span className='text-yellow-500'><FontAwesomeIcon icon={faBowlRice} /></span></span></p>
                 </div>
                 <div className="hidden sm:flex items-center gap-6 text-lg">
                     <Link to="/">
@@ -46,8 +47,8 @@ const Header = () => {
             </div>
 
             {sideNav && (
-                <div className="inset-0 bg-gray-800 bg-opacity-75 z-40 flex items-center justify-center">
-                    <div className="bg-white w-full max-w-xs h-full relative flex flex-col items-center pt-10">
+                <div className="fixed w-[100%] z-50 border border-red-500">
+                    <div className="bg-white w-full h-[40%] relative flex flex-col items-center pt-10 border border-red-500">
                         <RxCross1 size={30} className="absolute top-3 right-3 cursor-pointer" onClick={handleChange} />
                         <ul className="flex flex-col gap-8 text-xl text-gray-700">
                             <Link to="/" onClick={handleChange}>

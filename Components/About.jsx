@@ -1,6 +1,4 @@
 import React from 'react';
-import FoodData from './FoodData';
-
 const AboutUs = () => {
   return (
     <div className='mt-10'>
@@ -35,7 +33,6 @@ const AboutUs = () => {
         </div>
       </div>
     </div>
-    <FoodData/>
     </div>
   );
 };

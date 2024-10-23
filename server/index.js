@@ -3,7 +3,6 @@ import mysql from 'mysql2/promise'; // Use mysql2, not mysql2/promise
 import cors from 'cors';
 import bcrypt from 'bcrypt';
 import cookieParser from 'cookie-parser';
-import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
 dotenv.config(); // Load environment variables

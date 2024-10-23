@@ -9,3 +9,6 @@
 .scrollbar-hide {
   scrollbar-width: none; /* Hide scrollbar for Firefox */
 }
+.slick-prev, .slick-next {
+  display: none !important;
+}

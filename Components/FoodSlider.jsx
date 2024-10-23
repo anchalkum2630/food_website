@@ -5,7 +5,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useViewContext } from './Context/Context_view';
 const FoodSlider = () => {
-  const {handleAdd,Favourite,Recipe}=useViewContext();
+  const {handleAdd,Favourite}=useViewContext();
   const settings = {
     dots: true,
     infinite: true,
@@ -44,15 +44,15 @@ const FoodSlider = () => {
   };
   return (
     <>
-      <div className='w-[90%] mx-auto my-4'>
+      <div className='mx-auto my-4 w-[90%]'>
       <h2 className='font-bold text-3xl text-center'>What's On Your Mind?</h2>
       <div className='py-20 justify-center items-center'>
       <Slider {...settings}>
          {Favourite.slice(0,13).map((item) => (
             <div key={item.id} className='justify-center px-2'>
-              <img src={item.image_url} alt={item.name} className='w-full h-48 rounded-lg object-contain' />
+              <img src={item.image_url} alt={item.name} className='w-full h-48 rounded-lg image-resize' />
               <div className='flex justify-center py-2 px-4 flex-col items-center'>
-                <p className='text-[20px] line-clamp-2'>{item.name}</p>
+                <p className='text-[20px] line-clamp-1'>{item.name}</p>
                 <p>{item.prep_time}</p>
                 <button className='bg-black w-[100px] text-white rounded-md my-6 py-[10px] text-[15px] hover:text-yellow-500' onClick={()=>handleAdd(item.id)}>
                     Added

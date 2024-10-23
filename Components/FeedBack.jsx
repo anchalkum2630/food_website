@@ -98,7 +98,7 @@ const Card = ({ image, title, description, linkText }) => (
 // Main CardView component
 const FeedBack = () => {
   return (
-    <div className="z-[-10] py-16 mt-16 mb-8"> {/* Adjusted margin-top for Navbar */}
+    <div className="z-[-10] mt-16 mb-8"> {/* Adjusted margin-top for Navbar */}
       <div className="max-w-7xl mx-auto px-2 text-center">
         {/* Heading */}
         <h2 className="text-3xl font-bold mb-8" style={{ color: "#2f2e0c" }}>
