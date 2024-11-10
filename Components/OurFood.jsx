@@ -57,7 +57,7 @@ if (Recipe.length === 0) {
               <img src={item.image_url} alt={item.name} className='w-[90%] h-48 rounded-lg image-resize mx-auto transform transition-transform duration-300 group-hover:scale-110' onClick={()=>handleData(item.id)} />
               <div className='flex justify-center py-2 px-4 flex-col items-center'>
                 <p className='text-[20px] line-clamp-1'>{item.name}</p>
-                <p className='text-blue-500 mt-2' >{item.prep_time}</p>                  
+                <p className='text-blue-500 mt-2' >{item.prep_time}in</p>                  
                 <button className='bg-black w-[100px] text-white rounded-md my-6 py-[10px] text-[15px] hover:text-yellow-500' onClick={()=>handleAdd(item.id)}>
                     CookBook
                 </button>

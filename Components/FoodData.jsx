@@ -31,7 +31,7 @@ const FoodData = () => {
               <img src={foodDetail[0].image_url} alt={foodDetail[0].name} className='sm:w-[50%] h-48 rounded-lg image-resize mx-auto' />
               <div className='flex justify-center py-2 px-4 flex-col items-center'>
                 <p className='text-[20px]'><u>{foodDetail[0].name}</u></p>
-                <p className='text-blue-500 mt-2'>{foodDetail[0].prep_time}</p>
+                <p className='text-blue-500 mt-2'>{foodDetail[0].prep_time}in</p>
                 <div className='flex justify-center'>
                   <p className='border border-black m-4 px-2'>{foodDetail[0].cuisine}</p>
                   <p className='border border-black m-4 px-2'>{foodDetail[0].course}</p>

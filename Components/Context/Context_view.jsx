@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState,useEffect } from 'react';
-import { Food } from '../../Data/Data';
 import axios from 'axios';
 // Create context
 const viewContext = createContext();
