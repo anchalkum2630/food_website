@@ -6,7 +6,7 @@ import FeedBack from '../FeedBack'
 
 const Home = () => {
   return (
-    <div className=''>
+    <div>
       <Head/>
       <Delivery/>
       <FoodSlider/>

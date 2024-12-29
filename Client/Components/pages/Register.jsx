@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'
-import { useViewContext } from "../Context/Context_view";
-// import { useViewContext } from './Context/Context_view';
-const SignIn = () => {
-  const navigate = useNavigate();
-  const {setUserName,setUserPhone}=useViewContext(); 
+
+const Register = () => {
+  const navigate = useNavigate(); 
   const [formData, setFormData] = useState({
+    name: '',
     phone: '',
+    email: '',
+    gender: '',
     password: '',
+    // created: new Date().toISOString(),
   });
 
   const [errors, setErrors] = useState({});
@@ -17,11 +19,18 @@ const SignIn = () => {
   const validate = () => {
     const newErrors = {};
     const phonePattern = /^\d{10}$/;
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 
+    if (!formData.name || formData.name.trim() === '')
+      newErrors.name = 'First name is required';
     if (!formData.phone || !phonePattern.test(formData.phone))
       newErrors.phone = 'Valid phone number is required (10 digits)';
+    if (!formData.email || !emailPattern.test(formData.email))
+      newErrors.email = 'Please enter a valid email address';
     if (!formData.password || formData.password.length < 6)
       newErrors.password = 'Password must be at least 6 characters long';
+    if (!formData.gender)
+      newErrors.gender = 'Gender is required';
 
     return newErrors;
   };
@@ -38,18 +47,15 @@ const SignIn = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = async(e) => {
-    e.preventDefault();
-    const validationErrors = validate();
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const validationErrors = validate();
   if (Object.keys(validationErrors).length === 0) {
     try {
       console.log(formData)
-      const response = await axios.post('http://localhost:3081/sign_in', formData);
+      const response = await axios.post('http://localhost:3081/register', formData);
       console.log('Form submitted successfully:', response.data);
-      setUserName(response.data.name)
-      setUserPhone(response.data.phone)
-      console.log(response.data.name + response.data.phone)
-      navigate('/');
+      navigate('/SignIn');
     } catch (error) {
       console.error('Error submitting form:', error.response?.data || error.message);
       setErrors({ apiError: 'Something went wrong. Please try again.' });
@@ -58,6 +64,7 @@ const SignIn = () => {
     setErrors(validationErrors);
   }
 };
+
 
   return (
     <div className="fixed inset-0 flex justify-center backdrop-blur-sm bg-opacity-50 top-6 bg-black">
@@ -69,10 +76,29 @@ const SignIn = () => {
           className="w-[100%] h-[100%] bg-cover bg-center "
         />
         <div className="absolute inset-0 flex items-center justify-center">
-            <div className="mt-28 ">
+            <div className="mt-40 ">
       <div className="w-full max-w-md">
-        {/* <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Login</h2> */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-1">
+          
+          {/* First Name Input */}
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-600 mb-1">
+              Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className={`w-full p-1 border text-sm rounded-md shadow-sm focus:outline-none focus:ring-2 ${
+                errors.firstName ? 'border-red-500' : 'border-gray-300'
+              } focus:ring-yellow-500`}
+              placeholder="Enter your first name"
+            />
+            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+          </div>
+
           {/* Phone Number Input */}
           <div>
             <label htmlFor="phone" className="block text-sm font-medium text-gray-600 mb-1">
@@ -92,12 +118,53 @@ const SignIn = () => {
             {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
           </div>
 
+          {/* Email Input */}
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-600 mb-1">
+              Email Address
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className={`w-full p-1 border text-sm rounded-md shadow-sm focus:outline-none focus:ring-2 ${
+                errors.email ? 'border-red-500' : 'border-gray-300'
+              } focus:ring-yellow-500`}
+              placeholder="Enter your email"
+            />
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+          </div>
+
+          {/* Gender Input */}
+          <div>
+            <label htmlFor="gender" className="block text-sm font-medium text-gray-600 mb-1">
+              Gender
+            </label>
+            <select
+              id="gender"
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              className={`w-full p-1 text-gray-400 border text-sm rounded-md shadow-sm focus:outline-none focus:ring-2 ${
+                errors.gender ? 'border-red-500' : 'border-gray-300'
+              } focus:ring-yellow-500`}
+            >
+              <option value="">Select your gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+            {errors.gender && <p className="text-red-500 text-xs mt-1">{errors.gender}</p>}
+          </div>
+
           {/* Password Input */}
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-600 mb-1">
               Password
             </label>
-            <div className="relative">
+            <div className="relative mb-5">
               <input
                 type={showPassword ? 'text' : 'password'}
                 id="password"
@@ -117,25 +184,22 @@ const SignIn = () => {
               </span>
             </div>
             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
-            <a href="/reset-password" className="text-gray-600 text-xs">Forgot Password?</a>
           </div>
 
           <button
             type="submit"
-            className="w-full  bg-blue-500 text-white font-semibold rounded-md shadow-sm hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            className="w-full bg-blue-500 text-white font-semibold rounded-md shadow-sm hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
           >
-            Submit
+            Register
           </button>
         </form>
-        <p className="text-gray-600 mt-6">Don't have an account yet? <a href="/register" className="text-blue-500 font-semibold">Register</a></p>
+        <p className="text-gray-600 mt-6">Already have an account? <a href="/SignIn" className="text-blue-500 font-semibold">Login</a></p>
       </div>
     </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SignIn;
-
-// https://i.pinimg.com/736x/df/6f/a4/df6fa40267999c567d1c0c2718abcb3b.jpg
+export default Register;

@@ -3,15 +3,21 @@ import { useTypewriter, Cursor } from 'react-simple-typewriter';
 
 const Head = () => {
   const images = [
+    // {
+    //   url:"https://i.pinimg.com/736x/2c/c1/56/2cc15671ae9156431d8bcc36468f0bf6.jpg"
+    // },
+    // {
+    //   url: "https://i.pinimg.com/736x/2f/26/13/2f26132a6e685ea535ee4f2c04a56380.jpg"
+    // },
+    // {
+    //   url: "https://i.pinimg.com/736x/9e/ef/71/9eef71b816eb87e65b64ae72aa4c014a.jpg"
+    // },
     {
-      url: "https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg"
+      url: "https://i.pinimg.com/736x/da/dc/64/dadc64c99d75fa17597ce8c1d043c9cc.jpg"
     },
-    {
-      url: "https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg"
-    },
-    {
-      url: "https://images.pexels.com/photos/5792329/pexels-photo-5792329.jpeg"
-    }
+    // {
+    //   url:"https://i.pinimg.com/736x/ec/a2/a7/eca2a75df3cd648c87a978819b1f6fbc.jpg"
+    // }
   ];
   const [slider,setslider]=useState(0)
   
@@ -26,7 +32,7 @@ const Head = () => {
   useEffect(()=>{
     const sliderClear=setInterval(()=>{
       handleplus();
-    },2000)
+    },5000)
     return()=>clearInterval(sliderClear)
   },[slider])
 
@@ -42,19 +48,19 @@ const Head = () => {
     deleteSpeed: 50,
     delaySpeed: 1000
   });
-
+// bg-black opacity-50
   return (
-    <div className='mt-24 mx-auto '>
-      <div className='w-[90%] mx-auto h-[80vh] relative bg-black opacity-50 rounded-2xl overflow-hidden' >
+    <div className='mt-16 mx-auto bg-black '>
+      <div className='w-[100%] mx-auto h-[92vh] relative opacity-70 overflow-hidden' >
       {
         images.map((item, i) => (
           <div key={i} className={`${slider === i ? 'block' : 'hidden'}`}>
-            <img src={item.url} alt="Delicious food" className='w-full h-[80vh] rounded-2xl object-cover' />
+            <img src={item.url} alt="Delicious food" className='w-full h-[92vh]  image-resize' />
           </div>
         ))
       }
       </div>
-      <p className='absolute top-[50%] left-0 right-0 text-center text-[25px] lg:text-[35px] w-full mx-auto font-bold text-black'>
+      <p className='absolute top-[53%] left-0 right-0 text-center text-[25px] lg:text-[35px] w-full mx-auto font-bold text-white'>
         Welcome To The World Of <span className='text-black-500'>{text}</span>
         <Cursor cursorStyle='|' />
       </p>     

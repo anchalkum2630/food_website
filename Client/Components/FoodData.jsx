@@ -22,12 +22,11 @@ const FoodData = () => {
 
   return (
     close && (
-      <div className='fixed inset-0 flex justify-center backdrop-blur sm:bg-opacity-50'>
-        <div className='bg-white border border-black p-4 opacity-100 w-[80%] max-w-3xl h-[80vh] overflow-hidden mt-20'>
+      <div className='fixed inset-0 flex justify-center backdrop-blur sm:bg-opacity-50 mt-10'>
+        <div className='bg-white  p-4 opacity-100 w-[80%] max-w-3xl h-[80vh] overflow-hidden mt-20'>
           <div className='overflow-y-scroll scrollbar-hide h-full'>
             <div key={foodDetail[0].id} className='justify-center p-4'>
               <ImCross className='text-red-600 ml-auto cursor-pointer' onClick={onClose} />
-             {console.log(foodDetail[0].cuisine)}
               <img src={foodDetail[0].image_url} alt={foodDetail[0].name} className='sm:w-[50%] h-48 rounded-lg image-resize mx-auto' />
               <div className='flex justify-center py-2 px-4 flex-col items-center'>
                 <p className='text-[20px]'><u>{foodDetail[0].name}</u></p>
