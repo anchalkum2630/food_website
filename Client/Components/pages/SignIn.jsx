@@ -5,7 +5,7 @@ import { useViewContext } from "../Context/Context_view";
 // import { useViewContext } from './Context/Context_view';
 const SignIn = () => {
   const navigate = useNavigate();
-  const {setUserName,setUserPhone}=useViewContext(); 
+  const {setUserName,setUserPhone,setsearchUrl,UserPhone}=useViewContext(); 
   const [formData, setFormData] = useState({
     phone: '',
     password: '',

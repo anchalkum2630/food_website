@@ -1,8 +1,27 @@
 import React from 'react';
+import { format } from 'date-fns';
+import { parse } from 'date-fns';
+import { useViewContext } from '../Context/Context_view';
 
 const UserProfile = () => {
+  const {userProfile,userDate,userTime}=useViewContext();
+//   const createdAt = new Date(userProfile.created_at);
+//   if (isNaN(createdAt.getTime())) {
+//     console.error("Invalid date:", userProfile.created_at);
+//     // return <div>Error: Invalid date</div>;
+//   }
+
+// const formattedDate = format(createdAt, 'dd-MM-yyyy'); // Format as 30-12-2024
+// const formattedTime = format(createdAt, 'HH:mm');
+// console.log("date and time : ",createdAt.getTime())
+// console.log("formatteddate : ",formattedDate)
+// console.log("formatteddate : ",formattedTime)
+   
+
   return (
+    
     <div className='bg-white'>
+    {console.log(userProfile +"  "+userDate+" "+userTime)}
     <div className='flex pb-16'>
      <div className='flex mt-24 pt-10 lg:w-[50%] w-full flex-col sm:flex-row bg-white'>
       {/* Profile Image Section */}
@@ -17,14 +36,15 @@ const UserProfile = () => {
       {/* Profile Info Section */}
       <div className="w-[90%] sm:w-[50%] flex items-center sm:justify-start justify-center ml-12 ">
         <ul className="font-semibold text-justify space-y-2">
-          <li>Name: Anchal Kumari</li>
-          <li>Phone no. : 1234567890</li>
-          <li>Email : anchal@gmail.com</li>
-          <li>Gender : Female</li>
-          <li>Created : 12/12/2024</li>
-           <button className='bg-black w-[100%] text-white rounded-md py-[10px] mt-11 text-[15px] hover:text-yellow-500'>
-          Edit Profile
-        </button>
+            <li>Name : {userProfile.name}</li>
+            <li>Phone no : {userProfile.userid}</li>
+            <li>Email : {userProfile.email}</li>
+            <li>Gender : {userProfile.gender}</li>
+            <li>Created Date: {userDate}</li>
+            <li>Created Time:{userTime}</li>
+             <button className='bg-black w-[100%] text-white rounded-md py-[10px] mt-11 text-[15px] hover:text-yellow-500'>
+                   Edit Profile
+             </button>
         </ul>      
       </div> 
     </div>

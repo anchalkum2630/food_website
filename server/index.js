@@ -36,10 +36,38 @@ const pool = mysql.createPool({
 //   }
 // });
 
+//detail of user
+app.get('/api/userprofile', async (req, res) => {
+  const { UserPhone } = req.query;
+   if (!UserPhone || UserPhone.trim() === '') {
+    return res.status(400).json({ error: 'UserPhone is required' });
+  }
+
+  try {
+    // SQL query to get liked recipes for a specific user
+    const query = `
+      SELECT *
+      FROM users
+      WHERE userid = ? 
+    `;
+
+    // Execute the query with the UserPhone as a parameter
+    const [results] = await pool.query(query, [UserPhone]);
+    console.log(results[0]);
+    // Respond with the data and count
+    res.json(results[0]);
+  } catch (err) {
+    console.error('Error in profile :', err.message);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+//to get all the recipe 
 app.get('/api/recipes', async (req, res) => {
   try {
     const [results] = await pool.query('SELECT * FROM recipe LIMIT 200');
-    console.log("alltype of")
+    console.log("for first arrive")
     res.json(results);
   } catch (err) {
     return res.status(500).json(err);
@@ -95,7 +123,7 @@ app.get('/api/recipes/liked', async (req, res) => {
 //to get all search item
 app.get('/api/recipes/search/:query', async (req, res) => {
   const { query } = req.params; // Get the search term from the URL parameter
-  console.log("why this happen")
+  console.log("for first user to see by query")
   if (!query || query.trim() === '') {
     return res.status(400).json({ error: 'Invalid search query' });
   }
@@ -122,7 +150,7 @@ app.get('/api/recipes/search/:query', async (req, res) => {
     // }
 
     // Return the search results
-    console.log(results)
+    // console.log(results)
     res.json(results);
   } catch (error) {
     console.error('Error during search:', error.message);
@@ -134,7 +162,7 @@ app.get('/api/recipes/search/:query', async (req, res) => {
 app.get('/api/recipes/UserSearch/:query?', async (req, res) => {
   const { query } = req.params; // Get the search term from the URL parameter (optional)
   const { UserPhone } = req.query; // Get UserPhone from the query parameters
-
+  console.log("for registered user "+query +"  "+UserPhone)
   // Check if UserPhone is missing
   if (!UserPhone || UserPhone.trim() === '') {
     return res.status(400).json({ error: 'UserPhone is required' });
@@ -284,15 +312,15 @@ app.delete('/api/recipes/unlike/:id/:UserPhone', async (req, res) => {
       );
 
       if (result.affectedRows > 0) {
-        return res.json({ message: 'Recipe successfully unliked and removed from saved recipes' });
+        return res.json({ message: 'Recipe successfully removed from saved recipes' });
       } else {
-        return res.status(500).json({ error: 'Failed to unlike the recipe' });
+        return res.status(500).json({ error: 'Failed to remove the recipe' });
       }
     } else {
       return res.status(404).json({ error: 'Saved recipe not found for this user' });
     }
   } catch (error) {
-    console.error('Error unliking recipe:', error);
+    console.error('Error unsave:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

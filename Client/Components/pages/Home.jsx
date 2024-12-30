@@ -3,13 +3,17 @@ import Head from '../Head'
 import Delivery from '../Delivery'
 import FoodSlider from '../FoodSlider'
 import FeedBack from '../FeedBack'
+// import { ViewProvider, useViewContext } from '../Context/Context_view'
 
 const Home = () => {
+
+  // const {UserName}=useViewContext();
+
   return (
     <div>
       <Head/>
       <Delivery/>
-      <FoodSlider/>
+      {/* {UserName ? <FoodSlider /> : null} */}
       <FeedBack/>
     </div>
   )

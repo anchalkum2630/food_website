@@ -10,13 +10,16 @@ import { useViewContext } from './Context/Context_view';
 
 const Navbar = () => {
 
-    const {item,UserName}=useViewContext();
+    const {item,UserName,UserPhone,fetchSearch,handleprofile,handleLogout}=useViewContext();
 
     const [sideNav, setSideNav] = useState(false);
     
     const handleChange = () => {
         setSideNav(!sideNav);
     };
+    const handleClick = () => {  
+      fetchSearch();  // Trigger search when Enter is pressed   
+  };
 
     return (
         <header className="fixed top-0 left-0 w-[100%] px-4 py-2 bg-white border-red-800 shadow-md z-50">
@@ -32,7 +35,7 @@ const Navbar = () => {
                         <p className="hover:text-blue-500 text-[20px] font-bold">About Us</p>
                     </Link>
                     <Link to="/OurFood">
-                        <p className="hover:text-blue-500 text-[20px] font-bold">Our Recipe</p>
+                        <p className="hover:text-blue-500 text-[20px] font-bold" onClick={handleClick}>Our Recipe</p>
                     </Link>
                 </div>
                 <div className="flex gap-5 items-center">
@@ -45,13 +48,13 @@ const Navbar = () => {
                     <img src="https://images.unsplash.com/photo-1464863979621-258859e62245?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGdpcmwlMjBwcm9maWxlfGVufDB8fDB8fHww" 
                     alt="profilePic" 
                     className='w-12 h-12 rounded-full border image-resize mx-auto'
-                    title={UserName} />
+                    title={UserName} onClick={()=>handleprofile(UserPhone)}/>
                     </Link>
                     <Link to="/viewReceipe">
                     <p className='absolute top-0 right-24 hidden sm:flex text-blue-500 font-bold'>{item}</p>
                       <FaBookOpen size={30} className='mx-5 hidden sm:flex'/>
                     </Link>
-                    <IoMdLogOut size={30} className="cursor-pointer hidden sm:block"  />
+                    <IoMdLogOut size={30} className="cursor-pointer hidden sm:block" onClick={handleLogout} />
                     </>)}
                     <GiHamburgerMenu size={30} className="cursor-pointer sm:hidden" onClick={handleChange} />
                 </div>
@@ -72,13 +75,14 @@ const Navbar = () => {
                             <Link to="/OurFood" onClick={handleChange}>
                                 <li className="hover:text-blue-500">Our Recipe</li>
                             </Link>
+                            {!UserName?(
                             <Link to="/SignIn" onClick={handleChange}>
                                 <li className="hover:text-blue-500">Sign In</li>
-                            </Link>
+                            </Link>):(<>
                             <Link to="/viewReceipe">
                                <FaBookOpen size={30} className='mx-5' title='Saved'/>
                             </Link>
-                            <IoMdLogOut size={30} className="cursor-pointer justify-center mx-5 " title='logout'  />
+                            <IoMdLogOut size={30} className="cursor-pointer justify-center mx-5 " title='logout' onClick={handleLogout}  /></>)}
                         </ul>
                     </div>
                 </div>
