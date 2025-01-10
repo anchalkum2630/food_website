@@ -1,9 +1,17 @@
 import React from 'react'
 import { useViewContext } from '../Context/Context_view';
 import FoodData from '../FoodData';
+import { useNavigate } from 'react-router-dom';
 
 const ViewReceipe = () => {
-  const {handleRemove,Favourite,close,handleData}=useViewContext();
+  const {handleRemove,Favourite,close,handleData,UserName}=useViewContext();
+
+  const navigate=useNavigate();
+   if(!UserName){
+      navigate('/')
+   }
+
+
   if (!Favourite || Favourite.length === 0) {
     return <p className='w-[90%] mx-auto mt-44 mb-48 text-center text-3xl'>No recipes found.</p>;
   }

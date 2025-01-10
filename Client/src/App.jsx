@@ -13,8 +13,8 @@ import Register from '../Components/pages/Register'
 function App() {
   
   return (
-    <ViewProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <ViewProvider>
         <Navbar/>
         <Routes>
           <Route path='/' element={<Home/>} />
@@ -26,8 +26,9 @@ function App() {
           <Route path='/register' element={<Register/>}/>
         </Routes>
         <Footer />
-      </BrowserRouter>
-    </ViewProvider>
+      </ViewProvider>
+    </BrowserRouter>
+    
   )
 }
 export default App

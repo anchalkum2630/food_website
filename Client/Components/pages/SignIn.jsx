@@ -5,7 +5,7 @@ import { useViewContext } from "../Context/Context_view";
 // import { useViewContext } from './Context/Context_view';
 const SignIn = () => {
   const navigate = useNavigate();
-  const {setUserName,setUserPhone,setsearchUrl,UserPhone}=useViewContext(); 
+  const {setUserName,FetchSavedRecipe}=useViewContext(); 
   const [formData, setFormData] = useState({
     phone: '',
     password: '',
@@ -44,11 +44,14 @@ const SignIn = () => {
   if (Object.keys(validationErrors).length === 0) {
     try {
       console.log(formData)
-      const response = await axios.post('http://localhost:3081/sign_in', formData);
+      const response = await axios.post('http://localhost:3081/sign_in', formData,{withCredentials:true});
       console.log('Form submitted successfully:', response.data);
-      setUserName(response.data.name)
-      setUserPhone(response.data.phone)
-      console.log(response.data.name + response.data.phone)
+      // setUserName(response.data.name);
+      localStorage.setItem("UserName",response.data.name)
+      console.log(response.data.name + response.data.phone + response.data.token)
+      localStorage.setItem("accessToken", response.data.token);
+      console.log("local storage : "+localStorage.getItem("accessToken"));
+      FetchSavedRecipe();
       navigate('/');
     } catch (error) {
       console.error('Error submitting form:', error.response?.data || error.message);

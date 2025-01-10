@@ -2,32 +2,24 @@ import React from 'react';
 import { format } from 'date-fns';
 import { parse } from 'date-fns';
 import { useViewContext } from '../Context/Context_view';
+import { useNavigate } from 'react-router-dom';
 
 const UserProfile = () => {
-  const {userProfile,userDate,userTime}=useViewContext();
-//   const createdAt = new Date(userProfile.created_at);
-//   if (isNaN(createdAt.getTime())) {
-//     console.error("Invalid date:", userProfile.created_at);
-//     // return <div>Error: Invalid date</div>;
-//   }
-
-// const formattedDate = format(createdAt, 'dd-MM-yyyy'); // Format as 30-12-2024
-// const formattedTime = format(createdAt, 'HH:mm');
-// console.log("date and time : ",createdAt.getTime())
-// console.log("formatteddate : ",formattedDate)
-// console.log("formatteddate : ",formattedTime)
-   
+  const {userProfile,userDate,userTime,UserName}=useViewContext();
+  const navigate=useNavigate();
+   if(!UserName){
+      navigate('/')
+   }
 
   return (
     
     <div className='bg-white'>
-    {console.log(userProfile +"  "+userDate+" "+userTime)}
     <div className='flex pb-16'>
      <div className='flex mt-24 pt-10 lg:w-[50%] w-full flex-col sm:flex-row bg-white'>
       {/* Profile Image Section */}
       <div className="w-[100%] sm:w-[50%] p-5 flex sm:justify-end justify-center">
         <img
-          src="https://images.unsplash.com/photo-1464863979621-258859e62245?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGdpcmwlMjBwcm9maWxlfGVufDB8fDB8fHww"
+          src={userProfile.profile_pic||"https://i.pinimg.com/736x/bc/c7/41/bcc7416a37b874426e201c2506056a1c.jpg"}
           alt="profilePic"
           className="w-60 h-80 rounded-full border image-resize"
         />
@@ -40,8 +32,8 @@ const UserProfile = () => {
             <li>Phone no : {userProfile.userid}</li>
             <li>Email : {userProfile.email}</li>
             <li>Gender : {userProfile.gender}</li>
-            <li>Created Date: {userDate}</li>
-            <li>Created Time:{userTime}</li>
+            <li>Created Date : {userDate}</li>
+            <li>Created Time : {userTime}</li>
              <button className='bg-black w-[100%] text-white rounded-md py-[10px] mt-11 text-[15px] hover:text-yellow-500'>
                    Edit Profile
              </button>

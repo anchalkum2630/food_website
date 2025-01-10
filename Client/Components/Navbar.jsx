@@ -7,19 +7,21 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBowlRice } from '@fortawesome/free-solid-svg-icons';
 import { useViewContext } from './Context/Context_view';
+// import UserProfile from './pages/UserProfile';
 
 const Navbar = () => {
 
-    const {item,UserName,UserPhone,fetchSearch,handleprofile,handleLogout}=useViewContext();
+    const {item,UserName,userProfile,FetchSavedRecipe,fetchSearch,handleprofile,handleLogout}=useViewContext();
 
     const [sideNav, setSideNav] = useState(false);
     
     const handleChange = () => {
         setSideNav(!sideNav);
     };
-    const handleClick = () => {  
-      fetchSearch();  // Trigger search when Enter is pressed   
-  };
+//     const handleClick = () => {  
+//       fetchSearch();  // Trigger search when Enter is pressed   
+//   };
+// const Query=localStorage.getItem("setQuery");
 
     return (
         <header className="fixed top-0 left-0 w-[100%] px-4 py-2 bg-white border-red-800 shadow-md z-50">
@@ -35,7 +37,7 @@ const Navbar = () => {
                         <p className="hover:text-blue-500 text-[20px] font-bold">About Us</p>
                     </Link>
                     <Link to="/OurFood">
-                        <p className="hover:text-blue-500 text-[20px] font-bold" onClick={handleClick}>Our Recipe</p>
+                        <p className="hover:text-blue-500 text-[20px] font-bold" onClick={fetchSearch}>Our Recipe</p>
                     </Link>
                 </div>
                 <div className="flex gap-5 items-center">
@@ -45,14 +47,14 @@ const Navbar = () => {
                     :
                     (<>
                     <Link to="/UserProfile">
-                    <img src="https://images.unsplash.com/photo-1464863979621-258859e62245?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGdpcmwlMjBwcm9maWxlfGVufDB8fDB8fHww" 
+                    <img src={userProfile.profile_pic||"https://i.pinimg.com/736x/bc/c7/41/bcc7416a37b874426e201c2506056a1c.jpg"} 
                     alt="profilePic" 
                     className='w-12 h-12 rounded-full border image-resize mx-auto'
-                    title={UserName} onClick={()=>handleprofile(UserPhone)}/>
+                    title={UserName} onClick={()=>handleprofile()}/>
                     </Link>
                     <Link to="/viewReceipe">
                     <p className='absolute top-0 right-24 hidden sm:flex text-blue-500 font-bold'>{item}</p>
-                      <FaBookOpen size={30} className='mx-5 hidden sm:flex'/>
+                      <FaBookOpen size={30} className='mx-5 hidden sm:flex' onClick={FetchSavedRecipe}/>
                     </Link>
                     <IoMdLogOut size={30} className="cursor-pointer hidden sm:block" onClick={handleLogout} />
                     </>)}
@@ -80,7 +82,7 @@ const Navbar = () => {
                                 <li className="hover:text-blue-500">Sign In</li>
                             </Link>):(<>
                             <Link to="/viewReceipe">
-                               <FaBookOpen size={30} className='mx-5' title='Saved'/>
+                               <FaBookOpen size={30} className='mx-5' title='Saved' onClick={FetchSavedRecipe}/>
                             </Link>
                             <IoMdLogOut size={30} className="cursor-pointer justify-center mx-5 " title='logout' onClick={handleLogout}  /></>)}
                         </ul>

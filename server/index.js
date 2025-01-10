@@ -1,6 +1,7 @@
 import express from 'express';
 import mysql from 'mysql2/promise'; // Use mysql2, not mysql2/promise
 import cors from 'cors';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
@@ -18,6 +19,12 @@ app.use(cors({
 }));
 app.use(cookieParser());
 
+const SECRET_KEY = "Access";
+const REFRESH_SECRET_KEY = "Refresh";
+// Generate tokens
+const generateAccessToken = (user) => jwt.sign(user, SECRET_KEY, { expiresIn: "5000" });
+const generateRefreshToken = (user) => jwt.sign(user, REFRESH_SECRET_KEY,{ expiresIn: "1d" });
+
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -25,20 +32,70 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME,
 });
 
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(403).json({ error: 'Token missing' });
 
-//to get all the unliked recipe
-// app.get('/api/recipes', async (req, res) => {
-//   try {
-//     const [results] = await pool.query('SELECT * FROM recipe WHERE Liked=0 LIMIT 100');
-//     res.json(results);
-//   } catch (err) {
-//     return res.status(500).json(err);
-//   }
-// });
+  jwt.verify(token, SECRET_KEY, (err, user) => {
+    if (err) {
+      console.error('Token verification error:', err);
+      return res.status(403).json({ error: 'Invalid or expired token' });
+    }
+    req.user = user; // Attach decoded token to request
+    next();
+  });
+}
 
-//detail of user
-app.get('/api/userprofile', async (req, res) => {
-  const { UserPhone } = req.query;
+
+//refresh token
+app.post('/token', async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  console.log("refresh token : "+refreshToken)
+  // Check if the refresh token is provided
+  if (!refreshToken) {
+    return res.sendStatus(401); // Unauthorized
+  }
+
+  try {
+    // Verify if the refresh token exists in the database
+    const [results] = await pool.query(
+      'SELECT * FROM refresh_tokens WHERE refresh_token = ?',
+      [refreshToken]
+    );
+    console.log(results.length)
+    // If the token doesn't exist, deny access
+    if (results.length === 0) {
+      return res.sendStatus(403); // Forbidden
+    }
+
+    // Verify the refresh token and decode the user details
+    jwt.verify(refreshToken, REFRESH_SECRET_KEY, (err, user) => {
+      if (err) {
+        return res.sendStatus(403); // Forbidden
+      }
+
+      // Extract `user.id` and other details from the token payload
+      const newAccessToken = generateAccessToken({
+        id: user.id,
+        username: user.username,
+        token:"Access"
+      });
+
+      // Respond with the new access token
+      res.json({ token: newAccessToken });
+    });
+  } catch (error) {
+    console.error('Error during token refresh:', error);
+    return res.sendStatus(500); // Internal Server Error
+  }
+});
+
+
+//detail of user | completed
+app.get('/api/userprofile',authenticateToken, async (req, res) => {
+  const UserPhone = req.user.id;
+  console.log("userprofile: "+UserPhone);
    if (!UserPhone || UserPhone.trim() === '') {
     return res.status(400).json({ error: 'UserPhone is required' });
   }
@@ -62,8 +119,7 @@ app.get('/api/userprofile', async (req, res) => {
   }
 });
 
-
-//to get all the recipe 
+//to get all the recipe at first time |completed
 app.get('/api/recipes', async (req, res) => {
   try {
     const [results] = await pool.query('SELECT * FROM recipe LIMIT 200');
@@ -74,22 +130,9 @@ app.get('/api/recipes', async (req, res) => {
   }
 });
 
-//to get liked recipe
-// app.get('/api/recipes/liked', async (req, res) => {
-//   try {
-//     const [results] = await pool.query('SELECT * FROM recipe WHERE Liked=1');
-//     res.json({
-//       count:results.length,
-//       data:results,
-//     });
-//   } catch (err) {
-//     return res.status(500).json(err);
-//   }
-// });
-
-
-app.get('/api/recipes/liked', async (req, res) => {
-  const { UserPhone } = req.query; // Get the user phone or ID from query parameters
+//to get all the saved recipe | completed
+app.get('/api/recipes/liked',authenticateToken, async (req, res) => {
+  const UserPhone = req.user.id; // Get the user phone or ID from query parameters
 
   if (!UserPhone || UserPhone.trim() === '') {
     return res.status(400).json({ error: 'UserPhone is required' });
@@ -120,37 +163,39 @@ app.get('/api/recipes/liked', async (req, res) => {
 
 
 
-//to get all search item
-app.get('/api/recipes/search/:query', async (req, res) => {
+//to get all search item before signin
+app.get('/api/recipes/search/:query?', async (req, res) => {
   const { query } = req.params; // Get the search term from the URL parameter
-  console.log("for first user to see by query")
-  if (!query || query.trim() === '') {
-    return res.status(400).json({ error: 'Invalid search query' });
-  }
+  console.log("for first user to see by query");
 
   try {
-    // Construct the search query to match the keyword in name, description, or ingredients
-    const searchQuery = `
-      SELECT * 
-      FROM recipe 
-      WHERE name LIKE ? LIMIT 100
-    `;
+    let searchQuery;
+    let queryParams = [];
 
-    // Use wildcards for partial matching
-    const searchPattern = `%${query}%`;
+    if (!query || query.trim() === '') {
+      // If the query is empty, return all recipes
+      searchQuery = `
+        SELECT * 
+        FROM recipe 
+        LIMIT 100
+      `;
+    } else {
+      // If the query is not empty, search for recipes matching the query
+      searchQuery = `
+        SELECT * 
+        FROM recipe 
+        WHERE name LIKE ? 
+        LIMIT 100
+      `;
+      // Use wildcards for partial matching
+      const searchPattern = `%${query}%`;
+      queryParams = [searchPattern];
+    }
 
-    // Log the query for debugging purposes
-    // console.log(`Executing search query with: ${searchPattern}`);
+    // Execute the query
+    const [results] = await pool.query(searchQuery, queryParams);
 
-    // Execute the query with the search term
-    const [results] = await pool.query(searchQuery, [searchPattern]);
-    // If no results are found, return a 404
-    // if (results.length === 0) {
-    //   return res.status(404).json({ error: 'No recipes found' });
-    // }
-
-    // Return the search results
-    // console.log(results)
+    // Send the results as the response
     res.json(results);
   } catch (error) {
     console.error('Error during search:', error.message);
@@ -158,10 +203,11 @@ app.get('/api/recipes/search/:query', async (req, res) => {
   }
 });
 
-//to search recipe with the userphone
-app.get('/api/recipes/UserSearch/:query?', async (req, res) => {
+
+//to search recipe after signin
+app.get('/api/recipes/UserSearch/:query?',authenticateToken, async (req, res) => {
   const { query } = req.params; // Get the search term from the URL parameter (optional)
-  const { UserPhone } = req.query; // Get UserPhone from the query parameters
+  const  UserPhone  = req.user.id; // Get UserPhone from the query parameters
   console.log("for registered user "+query +"  "+UserPhone)
   // Check if UserPhone is missing
   if (!UserPhone || UserPhone.trim() === '') {
@@ -224,42 +270,10 @@ app.get('/api/recipes/search/detail/:query', async (req, res) => {
   }
 });
 
-
-//to update liked recipe
-// app.put('/api/recipes/addlike/:id', async (req, res) => {
-//   const { id } = req.params;
-
-//   try {
-//     // First, check the current liked status
-//     const [currentStatus] = await pool.execute('SELECT liked FROM recipe WHERE id = ?', [id]);
-    
-//     if (currentStatus.length > 0) {
-//       const currentLiked = currentStatus[0].liked;
-
-//       // Only update if the current liked status is 0
-//       if (currentLiked === 0) {
-//         const [result] = await pool.execute('UPDATE recipe SET liked = ? WHERE id = ?', [1, id]);
-        
-//         if (result.affectedRows > 0) {
-//           return res.json({ message: 'Recipe liked status updated to 1' });
-//         } else {
-//           return res.status(404).json({ error: 'Recipe not found' });
-//         }
-//       } else {
-//         return res.status(400).json({ error: 'Recipe already liked' });
-//       }
-//     } else {
-//       return res.status(404).json({ error: 'Recipe not found' });
-//     }
-//   } catch (error) {
-//     console.error('Error updating recipe:', error);
-//     res.status(500).json({ error: 'Error updating recipe' });
-//   }
-// });
-
-app.post('/api/recipes/addlike', async (req, res) => {
-  const { id, UserPhone } = req.body; // Extract id and UserPhone from the request body
-
+//insert saved recipe to cookbook | complete
+app.post('/api/recipes/addlike',authenticateToken, async (req, res) => {
+  const  {id} = req.body; // Extract id and UserPhone from the request body
+  const UserPhone=req.user.id;
   if (!id || !UserPhone) {
     return res.status(400).json({ error: 'Both id and UserPhone are required' });
   }
@@ -282,6 +296,7 @@ app.post('/api/recipes/addlike', async (req, res) => {
     );
 
     if (insertResult.affectedRows > 0) {
+      console.log("complete saved recipe");
       return res.json({ message: 'Recipe successfully saved for the user' });
     } else {
       return res.status(500).json({ error: 'Failed to save the recipe' });
@@ -293,43 +308,51 @@ app.post('/api/recipes/addlike', async (req, res) => {
 });
 
 
-//to update unliked recipe
-app.delete('/api/recipes/unlike/:id/:UserPhone', async (req, res) => {
-  const { id, UserPhone } = req.params;
+//to delete liked recipe | complete
+app.delete('/api/recipes/unlike', authenticateToken, async (req, res) => {
+  const { id } = req.body;
+  const UserPhone = req.user.id;
+
+  console.log(`Recipe ID: ${id}, UserPhone: ${UserPhone}`);
+
+  if (!id || !UserPhone) {
+    return res.status(400).json({ error: 'Recipe ID and UserPhone are required' });
+  }
 
   try {
-    // Check if the saved recipe exists for the given user and recipe ID
+    // Check if the saved recipe exists
     const [existingEntry] = await pool.execute(
       'SELECT * FROM savedrecipe WHERE id = ? AND userid = ?',
       [id, UserPhone]
     );
 
-    if (existingEntry.length > 0) {
-      // If the entry exists, delete it
-      const [result] = await pool.execute(
-        'DELETE FROM savedrecipe WHERE id = ? AND userid = ?',
-        [id, UserPhone]
-      );
-
-      if (result.affectedRows > 0) {
-        return res.json({ message: 'Recipe successfully removed from saved recipes' });
-      } else {
-        return res.status(500).json({ error: 'Failed to remove the recipe' });
-      }
-    } else {
+    if (existingEntry.length === 0) {
       return res.status(404).json({ error: 'Saved recipe not found for this user' });
     }
+
+    // Delete the recipe
+    const [result] = await pool.execute(
+      'DELETE FROM savedrecipe WHERE id = ? AND userid = ?',
+      [id, UserPhone]
+    );
+
+    if (result.affectedRows > 0) {
+      return res.json({ message: 'Recipe successfully removed from saved recipes' });
+    } else {
+      return res.status(500).json({ error: 'Failed to remove the recipe' });
+    }
   } catch (error) {
-    console.error('Error unsave:', error);
+    console.error('Error removing recipe:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 
-// User sign-in route
+
+// User sign-in route | complete
 app.post('/sign_in', async (req, res) => {
   const { phone, password } = req.body;
-  console.log(phone)
+  // console.log(phone)
   try {
     console.log(phone)
     const [rows] = await pool.query('SELECT * FROM users WHERE userid = ?', [phone]);
@@ -346,17 +369,23 @@ app.post('/sign_in', async (req, res) => {
     }
 
     // // Generate JWT
-    // const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
-
-    // res.status(200).json({ message: 'Sign-in successful', token });
-    res.status(200).json({ name:user.name,phone:user.userid});
+    const accessToken = generateAccessToken({ id: user.userid, username: user.name, token:"Access" });
+    const refreshToken = generateRefreshToken({ id: user.userid, username: user.name, token:"refresh" });
+    await pool.query(
+        "INSERT INTO refresh_tokens (refresh_token, userid) VALUES (?, ?)",
+        [refreshToken, user.userid]);
+    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: false,path: '/',maxAge: 7 * 24 * 60 * 60 * 1000,});
+    console.log("refreshtoken first : "+refreshToken+" | cookiee refresh token : "+req.cookies.refreshToken)
+    res.status(200).json({ name:user.name,phone:user.userid,token:accessToken});
   } catch (error) {
     console.error('Error during sign-in:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
 
-// User registration route
+
+
+// User registration route | complete
 app.post('/register', async (req, res) => {
   const { name, email, phone, password,gender } = req.body;
   
@@ -375,7 +404,7 @@ app.post('/register', async (req, res) => {
     // const hashedPassword = await bcrypt.hash(password, 12);
 
     await pool.query('INSERT INTO users (userid, name, email, gender, password) VALUES (?, ?, ?, ?, ?)', [phone,name, email,gender,password]);
-
+ 
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     console.error('Error during registration:', error);

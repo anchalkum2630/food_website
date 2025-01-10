@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useViewContext } from '../Context/Context_view';
 import FoodData from '../FoodData';
 
 const OurFood = () => {
-  const {handleAdd,Recipe,fetchSearch,handleData,close}=useViewContext();
+  const {handleAdd,Recipe,fetchSearch,handleData,close,UserName}=useViewContext();
   const [searchFood,setsearchFood]=useState('');
   const handleSearch = (e) => {
     setsearchFood(e.target.value);
@@ -11,9 +11,17 @@ const OurFood = () => {
   };
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
+      localStorage.setItem("setQuery",searchFood);
       fetchSearch(searchFood);  // Trigger search when Enter is pressed
     }
   };
+  useEffect(() => {
+    const savedQuery = localStorage.getItem('setQuery');
+    if (savedQuery) {
+      setsearchFood(savedQuery); // Set the search term in the state
+      fetchSearch(savedQuery); // Trigger search for the saved query
+    }
+  }, []);
 
 if (Recipe.length === 0) {
     return (
@@ -59,9 +67,9 @@ if (Recipe.length === 0) {
                 <p className='text-[20px] line-clamp-1'>{item.name}</p>
                 <p className='text-blue-500 mt-2' >{item.prep_time}in</p>                  
                 <div className='flex'>
-                  <button className='bg-black w-[100px] text-white rounded-md my-6 mr-4 py-[10px] text-[15px] hover:text-yellow-500 ' onClick={()=>handleAdd(item.id)}>
+                  {UserName?<button className='bg-black w-[100px] text-white rounded-md my-6 mr-4 py-[10px] text-[15px] hover:text-yellow-500 ' onClick={()=>handleAdd(item.id)}>
                     CookBook
-                </button>
+                  </button>:null}
                 <button className='bg-black w-[100px] text-white rounded-md my-6 ml-4 py-[10px] text-[15px] hover:text-yellow-500' onClick={()=>handleData(item.id)}>
                     More
                 </button>
