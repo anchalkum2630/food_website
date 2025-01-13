@@ -3,6 +3,7 @@ import mysql from 'mysql2/promise'; // Use mysql2, not mysql2/promise
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import nodemailer from 'nodemailer';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 
@@ -120,15 +121,15 @@ app.get('/api/userprofile',authenticateToken, async (req, res) => {
 });
 
 //to get all the recipe at first time |completed
-app.get('/api/recipes', async (req, res) => {
-  try {
-    const [results] = await pool.query('SELECT * FROM recipe LIMIT 200');
-    console.log("for first arrive")
-    res.json(results);
-  } catch (err) {
-    return res.status(500).json(err);
-  }
-});
+// app.get('/api/recipes', async (req, res) => {
+//   try {
+//     const [results] = await pool.query('SELECT * FROM recipe LIMIT 200');
+//     console.log("for first arrive")
+//     res.json(results);
+//   } catch (err) {
+//     return res.status(500).json(err);
+//   }
+// });
 
 //to get all the saved recipe | completed
 app.get('/api/recipes/liked',authenticateToken, async (req, res) => {
@@ -163,7 +164,7 @@ app.get('/api/recipes/liked',authenticateToken, async (req, res) => {
 
 
 
-//to get all search item before signin
+//to get all search item before signin | complete
 app.get('/api/recipes/search/:query?', async (req, res) => {
   const { query } = req.params; // Get the search term from the URL parameter
   console.log("for first user to see by query");
@@ -204,7 +205,7 @@ app.get('/api/recipes/search/:query?', async (req, res) => {
 });
 
 
-//to search recipe after signin
+//to search recipe after signin | complete
 app.get('/api/recipes/UserSearch/:query?',authenticateToken, async (req, res) => {
   const { query } = req.params; // Get the search term from the URL parameter (optional)
   const  UserPhone  = req.user.id; // Get UserPhone from the query parameters
@@ -411,6 +412,76 @@ app.post('/register', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+
+
+//for nodemailer
+let otpStore = {};
+
+// Nodemailer transport configuration
+const transporter = nodemailer.createTransport({
+  service: 'gmail', // You can use another email provider
+  port:465,
+  secure:true,
+  auth: {
+    user: 'ancjyo3030@gmail.com',  // Use your email here
+    pass: 'fupa kehg swtc fwvs'    // Use your email password or app-specific password
+  }
+});
+
+// Function to generate a random OTP (6 digits)
+const generateOtp = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// API to send OTP
+app.post('/send-otp', (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required' });
+  }
+
+  const otp = generateOtp();
+  otpStore[email] = otp;  // Store the OTP temporarily in memory
+
+  // Send OTP to email
+  const mailOptions = {
+    from: 'ancjyo3030@gmail.com',
+    to: email,
+    subject: 'Your OTP Code',
+    text: `Your OTP code is: ${otp}`
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return res.status(500).json({ message: 'Error sending OTP' });
+    }
+    console.log('OTP sent: ' + info.response);
+    res.status(200).json({ message: 'OTP sent successfully' });
+  });
+});
+
+// API to verify OTP
+app.post('/verify-otp', (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ message: 'Email and OTP are required' });
+  }
+
+  const storedOtp = otpStore[email];
+
+  if (storedOtp === otp) {
+    // OTP is correct, clear OTP from store (optional)
+    delete otpStore[email];
+    return res.status(200).json({ message: 'OTP verified successfully' });
+  } else {
+    return res.status(400).json({ message: 'Invalid OTP' });
+  }
+});
+
+
 
 // Start server
 app.listen(port, () => {
