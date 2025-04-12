@@ -1,112 +1,174 @@
-# 🍽️ YumRecipe - Full Stack Food Recipe Platform
+# 🍽️ YumRecipe – Version 1 | Indian Recipe Web App
 
-A responsive, full-stack food recipe web application where users can explore Indian recipes, register/login, and manage their favorite dishes. Built with **React.js, Tailwind CSS, Node.js, Express.js, and MySQL**.
+**YumRecipe** is a responsive full-stack web application that allows users to browse Indian recipes, register/login securely, and save their favorite dishes for later. Built using **React.js**, **Tailwind CSS**, **Redux Toolkit**, **Node.js**, **Express.js**, **Prisma**, and **PostgreSQL**, this project reflects a real-world scalable system developed during my MCA at **MANIT Bhopal**.
 
-> 🚀 Built as part of my MCA journey at Maulana Azad National Institute of Technology (MANIT), Bhopal. Designed to scale and customizable for real-world deployment.
+> 🔥 Version 1 focuses entirely on the **User experience**: exploring recipes, saving favorites, and secure authentication.
 
 ---
 
 ## 🌐 Live Demo
 
-**Coming soon...** (You can add your Netlify/Vercel link here once deployed)
+**Coming Soon...**  
+_(Will be deployed using Vercel (Frontend) + Render/Railway (Backend))_
 
 ---
 
-## 📁 Repository Structure
+## 🧱 Tech Stack
+
+| Layer          | Technology                                   |
+|----------------|----------------------------------------------|
+| Frontend       | React.js, Tailwind CSS, Redux Toolkit, Axios |
+| Backend        | Node.js, Express.js, JWT, cookie-parser      |
+| Database       | PostgreSQL (via Prisma ORM)                  |
+| Tools/Infra    | Prisma, Docker, pgAdmin, Prisma Studio       |
+
+---
+
+## 📁 Project Structure
 
 ```bash
-food_website/
-├── Client/        # React Frontend
-├── server/        # Node.js + Express Backend
+yumrecipe/
+├── client/               # React Frontend
+│   ├── components/       # UI components
+│   ├── pages/            # Login, Register, Recipes, Saved
+│   └── store/            # Redux Toolkit setup
+│
+├── server/               # Node.js Backend
+│   ├── controllers/      # Logic for users, recipes
+│   ├── routes/           # Auth & Recipe APIs
+│   ├── middlewares/      # Auth middleware
+│   ├── prismaClient.js   # Prisma DB connection
+│   └── index.js          # Main app file
+│
+├── prisma/               # Prisma Schema & Migrations
+│   ├── schema.prisma
+│   └── migrations/
+│
+├── docker-compose.yml    # PostgreSQL container setup
+├── .env                  # DB and JWT secrets
+└── pg_data/              # PostgreSQL volume (auto-generated)
 ```
 
 ---
 
-## 💻 Tech Stack
+## ✨ Features – Version 1
 
-| Frontend          | Backend             | Database     | Others            |
-|------------------|---------------------|--------------|-------------------|
-| React.js          | Node.js             | MySQL        | REST APIs         |
-| Tailwind CSS      | Express.js          |              | Axios, JWT        |
-| React Router DOM  | bcrypt, dotenv      |              | cookie-parser     |
-
----
-
-## ✨ Features
-
-- ✅ **User Registration & Login**
-- ✅ **JWT Authentication with Cookies**
-- ✅ **Browse Recipe Cards**
-- ✅ **Responsive UI (Mobile + Desktop)**
-- ✅ **Add New Recipes**
-- ✅ **Backend API Integration**
+- ✅ Secure user registration & login using JWT + cookies
+- ✅ Browse a curated list of Indian recipes
+- ✅ Save (favorite) recipes for later
+- ✅ Responsive UI (mobile & desktop friendly)
+- ✅ Redux Toolkit for scalable state management
+- ✅ Backend REST API with authentication middleware
+- ✅ PostgreSQL setup via Docker & Prisma ORM
 
 ---
 
-## 🔐 Authentication Flow
+## 🔐 Auth Flow (JWT + Cookies)
 
-- Secure login using **JWT tokens**
-- Token stored in cookies for protected routes
-- Middleware to verify authentication status
+1. User logs in → token is generated
+2. Token is stored in HTTP-only cookie
+3. Protected routes verify token server-side
+4. Saved recipes are only visible to logged-in users
 
 ---
 
-## 🔧 Setup Instructions
+## ⚙️ Getting Started
 
-### 1. Clone the Repository
+### 🔽 Clone the Project
 
 ```bash
-git clone https://github.com/anchalkum2630/food_website
-cd food_website
+git clone https://github.com/anchalkum2630/yumrecipe
+cd yumrecipe
 ```
 
-### 2. Frontend Setup (`Client`)
+---
+
+### 🐘 Start PostgreSQL via Docker
 
 ```bash
-cd Client
-npm install
-npm run dev   # or npm start
+docker-compose up -d
 ```
 
-### 3. Backend Setup (`server`)
+---
+
+### 🔌 Backend Setup
 
 ```bash
 cd server
 npm install
-node index.js
+npx prisma generate
+npx prisma migrate dev --name init
+npm run dev
 ```
 
 ✅ Create a `.env` file in `server/`:
 
 ```env
-PORT=5000
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=your_database
+DATABASE_URL="postgresql://anchal:anchal123@localhost:5432/yumrecipe"
 JWT_SECRET=your_jwt_secret
+PORT=5000
 ```
 
 ---
 
-## 📸 Upcoming Enhancements
+### 🌐 Frontend Setup
 
-- 🔄 Upload Recipe Images using `Multer` & `Cloudinary`
-- 💬 Add Comments/Reviews per Recipe
-- 📊 Admin Dashboard with analytics
-- 🔍 Search & Filter Recipes
-- 🌍 Deployment on Netlify + Render/Vercel
+```bash
+cd client
+npm install
+npm run dev
+```
 
 ---
 
-## 👩‍💻 Developer
+### 🧪 Test in Browser
+
+- Home: `http://localhost:3000`
+- Login/Register
+- Browse Recipes
+- Add to Saved
+
+---
+
+## 🧱 Prisma Workflow
+
+- Define schema in `prisma/schema.prisma`
+- Apply with:
+```bash
+npx prisma migrate dev --name migration_name
+```
+- View DB using Prisma Studio:
+```bash
+npx prisma studio
+```
+
+---
+
+## 📍 Upcoming Version 2 (Preview)
+
+- 👨‍🍳 Chef registration, availability, and order assignment
+- 📍 Live location tracking using Redis + WebSocket
+- 🛒 Cart-based multi-recipe ordering
+- 💳 Online payment integration (Pay Now / Pay Later)
+- 📊 Admin dashboard (feedback, complaints)
+- 🌐 Fully containerized deployment (Docker + CI/CD)
+
+---
+
+## 👩‍💻 Author
 
 **Anchal Kumari**  
-👩 MCA @ MANIT Bhopal  
+🎓 MCA @ MANIT Bhopal  
 🔗 [LinkedIn](https://www.linkedin.com/in/anchalkumari2630/)  
-💻 Passionate about Full Stack & Open Source  
-📫 anchalkumari2630@gmail.com
+📧 anchalkumari2630@gmail.com
 
 ---
 
-## ⭐ If you like this project, don't forget to give it a star!
+## ⭐ Show Your Support
+
+If you like this project:
+
+- ⭐ Star the repo
+- 🍴 Fork it
+- 🔁 Share it
+- 🚀 Stay tuned for **Version 2**!
