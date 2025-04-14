@@ -172,3 +172,37 @@ If you like this project:
 - 🍴 Fork it
 - 🔁 Share it
 - 🚀 Stay tuned for **Version 2**!
+
+
+
+//docker setup
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: yumrecipe-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: yumrecipe
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: yumrecipe-pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@pg.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:
