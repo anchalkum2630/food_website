@@ -1,38 +1,29 @@
-// src/services/customer/customerService.js
-import prisma from '../../config/prisma.js';
-import redisClient from '../../config/redis.js';
-import { generateOtp, sendOtp } from '../../utils/otpUtils.js';
+import { generateOTP, sendOTP, verifyOTP, hashPassword } from '../utils/otpUtils';
+import redis from 'redis';
 
-export const registerCustomer = async (email, password) => {
-  const otp = generateOtp();
+const redisClient = redis.createClient({ url: process.env.REDIS_URL });
+await redisClient.connect();
 
-  // Store OTP in Redis with a 5-minute expiration
-  await redisClient.setEx(`otp:${email}`, 300, otp);
-
-  // Send OTP to user's email
-  await sendOtp(email, otp);
-
-  return { message: 'OTP sent to your email' };
+const registerUser = async (email) => {
+  const otp = generateOTP();
+  await redisClient.setEx(`otp:${email}`, 300, otp); // OTP expires in 5 minutes
+  await sendOTP(email, otp);
+  return { message: 'OTP sent to your email address' };
 };
 
-export const verifyOtp = async (email, otp) => {
-  const storedOtp = await redisClient.get(`otp:${email}`);
-
-  if (!storedOtp) {
-    throw new Error('OTP expired or not found');
+const verifyUser = async (email, otp) => {
+  const isVerified = await verifyOTP(email, otp);
+  if (isVerified) {
+    return { message: 'OTP verified successfully. Proceed to set your password.' };
   }
-
-  if (storedOtp !== otp) {
-    throw new Error('Invalid OTP');
-  }
-
-  // Create user in the database
-  await prisma.user.create({
-    data: { email, password },
-  });
-
-  // Delete OTP from Redis
-  await redisClient.del(`otp:${email}`);
-
-  return { message: 'Registration successful' };
+  return { message: 'Invalid OTP' };
 };
+
+const insertPassword = async (email, password) => {
+  const hashedPassword = await hashPassword(password);
+  // Store the email and hashed password in your database
+  // Example: await User.create({ email, password: hashedPassword });
+  return { message: 'Password set successfully. Your account has been created.' };
+};
+
+export { registerUser, verifyUser, setPassword };

@@ -1,10 +1,10 @@
-// src/routes/customerRoutes.js
 import express from 'express';
-import { register, verify } from '../controllers/customer/authController.js';
+import { register, verify, setPassword } from '../controllers/customer/authController.js';
 
 const router = express.Router();
 
 router.post('/register', register);
-router.post('/verify', verify);
+router.post('/verify-otp', verify);
+router.post('/set-password', setPassword);
 
 export default router;
