@@ -1,0 +1,207 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+
+// ENUMS
+enum AuthType {
+  MANUAL
+  OAUTH
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum CartStatus {
+  ACTIVE
+  COMPLETED
+}
+
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum RoleType {
+  customer
+  chef
+}
+
+
+// MODELS
+
+model User {
+  id             Int            @id @default(autoincrement())
+  name           String
+  email          String         @unique
+  password       String?
+  authType       AuthType       @default(MANUAL)
+  authId         String?
+  authProvider   String?
+  gender         Gender?
+  phoneNo        String?
+  picUrl         String?
+  address        String?
+  addressCity    String?
+  addressState   String?
+  addressPincode String?
+  isBlocked      Boolean        @default(false)
+  blockReason    String?
+  blockedAt      DateTime?
+  refreshToken   String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  // Relations
+  feedbacks      Feedback[]     @relation("userFeedback")
+  complaints     Complaint[]    @relation("userComplaint")
+  customer       Customer?
+  chef           Chef?
+  savedRecipes   SavedRecipe[]  @relation("userSaved")
+}
+
+model Customer {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @unique
+  isActive   Boolean  @default(true)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role  RoleType @default(customer)
+  carts      Cart[]
+  orders     Order[]
+}
+
+model Chef {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @unique
+  isActive   Boolean  @default(true)
+  available  Boolean  @default(true)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role  RoleType @default(chef)
+  orders     Order[]
+}
+
+model Feedback {
+  id         Int      @id @default(autoincrement())
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  userId     Int
+  user       User     @relation("userFeedback", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Complaint {
+  id         Int      @id @default(autoincrement())
+  reason     String
+  status     String
+  createdAt  DateTime @default(now())
+
+  userId     Int
+  user       User     @relation("userComplaint", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Recipe {
+  id           Int           @id @default(autoincrement())
+  name         String
+  description  String
+  course       String
+  cuisine      String
+  diet         String
+  prepTime     Int
+  ingredients  String
+  instruction  String
+  imageUrl     String
+
+
+  cartItems    CartItem[]
+  savedBy      SavedRecipe[] @relation("recipeSaved")
+}
+
+model SavedRecipe {
+  id         Int       @id @default(autoincrement())
+  userId     Int?
+  recipeId   Int?
+  createdAt  DateTime  @default(now())
+
+  user       User?     @relation("userSaved", fields: [userId], references: [id], onDelete: SetNull)
+  recipe     Recipe?   @relation("recipeSaved", fields: [recipeId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, recipeId])
+}
+
+model Cart {
+  id          Int         @id @default(autoincrement())
+  createdAt   DateTime    @default(now())
+  status      CartStatus
+  customerId  Int
+  customer    Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  items       CartItem[]
+  order       Order?
+}
+
+model CartItem {
+  id         Int      @id @default(autoincrement())
+  quantity   Int
+  addedAt    DateTime @default(now())
+
+  cartId     Int
+  recipeId   Int
+  cart       Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  recipe     Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id            Int          @id @default(autoincrement())
+  orderAt       DateTime     @default(now())
+  acceptAt      DateTime?
+  completeAt    DateTime?
+  cancelReason  String?
+  status        OrderStatus  @default(PENDING)
+  latitude      Float?
+  longitude     Float?
+  amount   Float
+  cartId        Int          @unique
+  customerId    Int
+  chefId        Int
+
+  cart          Cart         @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  customer      Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  chef          Chef         @relation(fields: [chefId], references: [id], onDelete: Cascade)
+  payment       Payment?
+}
+
+model Payment {
+  id             Int            @id @default(autoincrement())
+  amount         Float
+  status         PaymentStatus  @default(PENDING)
+  paidAt         DateTime?
+  paymentMode    String
+  transactionId  String?
+  orderId        Int            @unique
+  order          Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
