@@ -1,5 +1,6 @@
-import { generateOTP, sendOTP, verifyOTP, hashPassword } from '../utils/otpUtils';
+import { generateOTP, sendOTP, verifyOTP, hashPassword } from '../../utils/otpUtils.js';
 import redis from 'redis';
+import prisma from '../../config/prisma.js'
 
 const redisClient = redis.createClient({ url: process.env.REDIS_URL });
 await redisClient.connect();
@@ -21,9 +22,28 @@ const verifyUser = async (email, otp) => {
 
 const insertPassword = async (email, password) => {
   const hashedPassword = await hashPassword(password);
-  // Store the email and hashed password in your database
-  // Example: await User.create({ email, password: hashedPassword });
+
+const user = await prisma.User.create({
+    data: {
+      email,
+      password: hashedPassword,
+      authType: 'MANUAL',
+      // Add other user-specific fields if needed
+    },
+  });
+
+  // Create Customer linked to the User
+  const customer = await prisma.Customer.create({
+    data: {
+      user: {
+        connect: { id: user.id },
+      },
+      // Add other customer-specific fields if needed
+    },
+  });
+
+
   return { message: 'Password set successfully. Your account has been created.' };
 };
 
-export { registerUser, verifyUser, setPassword };
+export { registerUser, verifyUser, insertPassword };

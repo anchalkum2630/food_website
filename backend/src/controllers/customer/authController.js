@@ -1,4 +1,4 @@
-import { registerUser, verifyUser, insertPassword } from '../services/customer/customerService.js';
+import { registerUser, verifyUser, insertPassword } from '../../services/customer/customerService.js';
 
 const register = async (req, res) => {
   const { email } = req.body;
