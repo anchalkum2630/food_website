@@ -1,6 +1,9 @@
 import { generateOTP, sendOTP, verifyOTP, hashPassword } from '../../utils/otpUtils.js';
 import redis from 'redis';
 import prisma from '../../config/prisma.js'
+import { generateToken } from '../../utils/jwtUtils.js';
+import bcrypt from 'bcryptjs';
+
 
 const redisClient = redis.createClient({ url: process.env.REDIS_URL });
 await redisClient.connect();
@@ -46,4 +49,19 @@ const user = await prisma.User.create({
   return { message: 'Password set successfully. Your account has been created.' };
 };
 
-export { registerUser, verifyUser, insertPassword };
+const loginUser = async (email, password) => {
+  const user = await prisma.User.findUnique({ where: { email } });
+  if (!user || !user.password) {
+    throw new Error('Invalid credentials');
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw new Error('Invalid credentials');
+  }
+
+  const token = generateToken({ userId: user.id });
+  return { token };
+};
+
+export { registerUser, verifyUser, insertPassword,loginUser };
