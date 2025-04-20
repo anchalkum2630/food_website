@@ -1,7 +1,8 @@
 import { generateOTP, sendOTP, verifyOTP, hashPassword } from '../../utils/otpUtils.js';
+import { hashToken } from '../../utils/hashToken.js';
 import redis from 'redis';
 import prisma from '../../config/prisma.js'
-import { generateToken } from '../../utils/jwtUtils.js';
+import { generateAccessToken,generateRefreshToken } from '../../utils/jwtUtils.js';
 import bcrypt from 'bcryptjs';
 
 
@@ -50,18 +51,25 @@ const user = await prisma.User.create({
 };
 
 const loginUser = async (email, password) => {
+  console.log(email,password)
   const user = await prisma.User.findUnique({ where: { email } });
-  if (!user || !user.password) {
-    throw new Error('Invalid credentials');
-  }
-
+  if (!user || !user.password) throw new Error('Invalid credentials');
+  console.log(user)
   const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    throw new Error('Invalid credentials');
-  }
+  if (!isMatch) throw new Error('Invalid credentials');
 
-  const token = generateToken({ userId: user.id });
-  return { token };
+  const accessToken = generateAccessToken({ userId: user.id });
+  const refreshToken = generateRefreshToken({ userId: user.id });
+
+  // Optional: store hashed refresh token in DB
+  // const hashed = hashToken(refreshToken);
+  await prisma.user.update({
+    where: { email },
+    data: { refreshToken: refreshToken },
+  });
+  console.log(accessToken+" "+refreshToken)
+
+  return { accessToken, refreshToken };
 };
 
 export { registerUser, verifyUser, insertPassword,loginUser };

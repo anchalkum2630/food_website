@@ -27,10 +27,6 @@ enum Gender {
   OTHER
 }
 
-enum CartStatus {
-  ACTIVE
-  COMPLETED
-}
 
 enum OrderStatus {
   PENDING
@@ -89,7 +85,6 @@ model Customer {
   isActive   Boolean  @default(true)
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   role  RoleType @default(customer)
-  carts      Cart[]
   orders     Order[]
 }
 
@@ -135,8 +130,6 @@ model Recipe {
   instruction  String
   imageUrl     String
 
-
-  cartItems    CartItem[]
   savedBy      SavedRecipe[] @relation("recipeSaved")
 }
 
@@ -152,27 +145,6 @@ model SavedRecipe {
   @@unique([userId, recipeId])
 }
 
-model Cart {
-  id          Int         @id @default(autoincrement())
-  createdAt   DateTime    @default(now())
-  status      CartStatus
-  customerId  Int
-  customer    Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
-
-  items       CartItem[]
-  order       Order?
-}
-
-model CartItem {
-  id         Int      @id @default(autoincrement())
-  quantity   Int
-  addedAt    DateTime @default(now())
-
-  cartId     Int
-  recipeId   Int
-  cart       Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  recipe     Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-}
 
 model Order {
   id            Int          @id @default(autoincrement())
@@ -184,11 +156,9 @@ model Order {
   latitude      Float?
   longitude     Float?
   amount   Float
-  cartId        Int          @unique
   customerId    Int
   chefId        Int
 
-  cart          Cart         @relation(fields: [cartId], references: [id], onDelete: Cascade)
   customer      Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
   chef          Chef         @relation(fields: [chefId], references: [id], onDelete: Cascade)
   payment       Payment?

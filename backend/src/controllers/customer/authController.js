@@ -34,16 +34,22 @@ const setPassword = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password are required' });
-  }
-
   try {
-    const response = await loginUser(email, password);
-    res.status(200).json(response);
+    const { accessToken, refreshToken } = await loginUser(email, password);
+
+    // Send refreshToken as HttpOnly cookie
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    res.status(200).json({ accessToken });
   } catch (error) {
     res.status(401).json({ message: error.message });
   }
 };
 
-export { register, verify, setPassword,login };
+
+export { register, verify, setPassword, login };
