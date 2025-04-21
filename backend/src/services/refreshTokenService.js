@@ -1,14 +1,18 @@
 import prisma from '../config/prisma.js'
 import { generateAccessToken} from '../utils/jwtUtils.js';
+import jwt from 'jsonwebtoken';
+import redisClient from '../config/redis.js';
 
 export const refresh_token = async (Token) => {
-  // const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-  // const hashed = hashToken(refreshToken);
+    const decoded = jwt.verify(Token, process.env.REFRESH_TOKEN_SECRET);
+  const userId = decoded.userId;
 
-  const tokenInDb = await prisma.User.findUnique({ where: { refreshToken: Token } });
-  if (!tokenInDb || tokenInDb.revoked) throw new Error('Invalid refresh token');
+  const storedToken = await redisClient.get(`refreshToken:${userId}`);
+  if (!storedToken || storedToken !== Token) {
+    throw new Error('Invalid or expired refresh token');
+  }
 
-  return generateAccessToken({ userId: decoded.userId });
+  return generateAccessToken({ userId });
 };
 
 export const logoutUser = async (refreshToken) => {

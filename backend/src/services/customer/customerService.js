@@ -63,11 +63,12 @@ const loginUser = async (email, password) => {
 
   // Optional: store hashed refresh token in DB
   // const hashed = hashToken(refreshToken);
-  await prisma.user.update({
-    where: { email },
-    data: { refreshToken: refreshToken },
+   await redisClient.set(`refreshToken:${user.id}`, refreshToken, {
+    EX: 7 * 24 * 60 * 60, // 7 days
   });
-  console.log(accessToken+" "+refreshToken)
+
+  console.log('Access:', accessToken);
+  console.log('Refresh:', refreshToken);
 
   return { accessToken, refreshToken };
 };
