@@ -51,10 +51,10 @@ const user = await prisma.User.create({
 };
 
 const loginUser = async (email, password) => {
-  console.log(email,password)
+  // console.log(email,password)
   const user = await prisma.User.findUnique({ where: { email } });
   if (!user || !user.password) throw new Error('Invalid credentials');
-  console.log(user)
+  // console.log(user)
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) throw new Error('Invalid credentials');
 
@@ -67,8 +67,8 @@ const loginUser = async (email, password) => {
     EX: 7 * 24 * 60 * 60, // 7 days
   });
 
-  console.log('Access:', accessToken);
-  console.log('Refresh:', refreshToken);
+  // console.log('Access:', accessToken);
+  // console.log('Refresh:', refreshToken);
 
   return { accessToken, refreshToken };
 };

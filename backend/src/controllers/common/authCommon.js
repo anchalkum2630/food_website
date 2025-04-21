@@ -1,4 +1,5 @@
 import { refresh_token } from '../../services/refreshTokenService.js';
+import { logoutUser } from '../../services/logoutService.js';
 
 export const refreshToken = async (req, res) => {
   const token = req.cookies?.refreshToken;
@@ -6,7 +7,7 @@ export const refreshToken = async (req, res) => {
   // console.log(token)
   try {
     const newAccessToken = await refresh_token(token);
-    console.log(token)
+    // console.log(token)
     res.status(200).json({ accessToken: newAccessToken });
   } catch (err) {
     console.log("error")
