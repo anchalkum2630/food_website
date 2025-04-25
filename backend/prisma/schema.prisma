@@ -15,11 +15,6 @@ datasource db {
 
 
 
-// ENUMS
-enum AuthType {
-  MANUAL
-  OAUTH
-}
 
 enum Gender {
   MALE
@@ -54,9 +49,7 @@ model User {
   name           String?
   email          String         @unique
   password       String?
-  authType       AuthType       @default(MANUAL)
-  authId         String?
-  authProvider   String?
+  googleId       String?        @unique
   gender         Gender?
   phoneNo        String?
   picUrl         String?

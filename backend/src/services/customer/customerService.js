@@ -1,13 +1,11 @@
 import { generateOTP, sendOTP, verifyOTP, hashPassword } from '../../utils/otpUtils.js';
-import { hashToken } from '../../utils/hashToken.js';
-import redis from 'redis';
-import prisma from '../../config/prisma.js'
+import prisma from '../../config/prismaConfig.js'
 import { generateAccessToken,generateRefreshToken } from '../../utils/jwtUtils.js';
 import bcrypt from 'bcryptjs';
+import redisClient from '../../config/redisConfig.js';
 
-
-const redisClient = redis.createClient({ url: process.env.REDIS_URL });
-await redisClient.connect();
+// const redisClient = redis.createClient({ url: process.env.REDIS_URL });
+// await redisClient.connect();
 
 const registerUser = async (email) => {
   const otp = generateOTP();
@@ -31,7 +29,6 @@ const user = await prisma.User.create({
     data: {
       email,
       password: hashedPassword,
-      authType: 'MANUAL',
       // Add other user-specific fields if needed
     },
   });

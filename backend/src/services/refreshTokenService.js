@@ -1,6 +1,6 @@
 import { generateAccessToken} from '../utils/jwtUtils.js';
 import jwt from 'jsonwebtoken';
-import redisClient from '../config/redis.js';
+import redisClient from '../config/redisConfig.js';
 
 export const refresh_token = async (Token) => {
     const decoded = jwt.verify(Token, process.env.REFRESH_TOKEN_SECRET);
