@@ -18,8 +18,10 @@ export const googleCallbackController = async(req, res) => {
       sameSite: 'Strict',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
-    console.log("google login done")
-    res.status(200).json({ accessToken , refreshToken });
+    console.log("google login done   "+accessToken)
+    const frontendUrl = "http://localhost:5173";
+    res.redirect(`${frontendUrl}/google-callback?accessToken=${accessToken}`);
+
   } catch (error) {
     console.error('Google Callback Error:', error);
     res.status(500).json({ message: 'Internal Server Error' });

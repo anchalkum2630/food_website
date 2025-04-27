@@ -8,10 +8,20 @@ import redisClient from '../../config/redisConfig.js';
 // await redisClient.connect();
 
 const registerUser = async (email) => {
+   const existingUser = await prisma.User.findUnique({
+    where: { email },
+  });
+  // console.log(existingUser)
+  if (existingUser) {
+    return {success: false};
+  }
+
+  // If email doesn't exist, generate OTP and send it
   const otp = generateOTP();
   await redisClient.setEx(`otp:${email}`, 300, otp); // OTP expires in 5 minutes
-  await sendOTP(email, otp);
-  return { message: 'OTP sent to your email address' };
+  await sendOTP(email, otp); // Send OTP to email
+  
+  return { success: true,message: 'OTP sent to your email address' };
 };
 
 const verifyUser = async (email, otp) => {

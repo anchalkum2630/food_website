@@ -27,7 +27,7 @@ if (Recipe.length === 0) {
     return (
       <>
        <div className='flex justify-between w-[90%] mx-auto mt-20'>
-          <h2 className='text-center text-yellow-500 text-3xl font-bold py-5'>Our Recipe</h2>
+          <h2 className='text-center text-green-700 text-3xl font-bold py-5'>Our Recipe</h2>
           <input
            type="text"
            value={searchFood}
@@ -47,7 +47,7 @@ if (Recipe.length === 0) {
     <>
       <div className='w-[90%] m-auto mt-20'>
         <div className='flex justify-between'>
-          <h2 className='text-center text-yellow-500 text-3xl font-bold py-5'>Our Recipe</h2>
+          <h2 className='text-center text-green-700 text-3xl font-bold py-5'>Our Recipe</h2>
           <input
            type="text"
            value={searchFood}

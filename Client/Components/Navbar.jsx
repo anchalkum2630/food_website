@@ -27,7 +27,7 @@ const Navbar = () => {
         <header className="fixed top-0 left-0 w-[100%] px-4 py-2 bg-white border-red-800 shadow-md z-50">
             <div className="flex justify-between items-center">
                 <div className="font-bold text-[20px]">
-                    <p className='text-[25px]'>Yum<span className="text-blue-500">Receipe <span className='text-yellow-500'><FontAwesomeIcon icon={faBowlRice} /></span></span></p>
+                    <p className='text-[25px]'>Yum<span className="text-green-700">Receipe <span className='text-yellow-500'><FontAwesomeIcon icon={faBowlRice} /></span></span></p>
                 </div>
                 <div className="hidden sm:flex items-center gap-6 text-lg">
                     <Link to="/">

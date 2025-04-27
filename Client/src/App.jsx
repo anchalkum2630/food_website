@@ -18,6 +18,7 @@ import AdminUsers from '../Components/pages/ADMIN/AdminUsers';
 import AdminFeedback from '../Components/pages/ADMIN/AdminFeedback';
 import AdminComplaint from '../Components/pages/ADMIN/AdminComplaint';
 import AdminAdd from '../Components/pages/ADMIN/AdminAdd';
+import GoogleCallback from '../Components/pages/GoogleCallback';
 
 function AppContent() {
   const location = useLocation();
@@ -53,6 +54,7 @@ function AppContent() {
         <Route path="/admin/feedback" element={<AdminFeedback />} />
         <Route path="/admin/complaints" element={<AdminComplaint />} />
         <Route path="/admin/adminadd" element={<AdminAdd />} />
+        <Route path="/google-callback" element={<GoogleCallback />} />
       </Routes>
 
       {/* Footer */}

@@ -1,8 +1,9 @@
 import prisma from '../config/prismaConfig.js'; // Assuming you're using Prisma as your ORM
 
 export const findOrCreateUser = async (profile) => {
-  const { id, emails, displayName } = profile;
+  const { id, emails, displayName ,photos } = profile;
   const email = emails[0].value;
+  const image= photos ? photos[0].value : null;
 
   // Check if the user already exists with this email (from email/password login)
   let user = await prisma.User.findUnique({ where: { email } });
@@ -13,6 +14,7 @@ export const findOrCreateUser = async (profile) => {
       data: {
         email,
         name: displayName,
+        picUrl:image,
         googleId: id, // Store the Google ID to link accounts
       },
     });

@@ -99,15 +99,8 @@ const fetchUrlSearch = async (url) => {
 
 
 
-  useEffect(() => {
-    // const Query=localStorage.getItem("setQuery");
-    // if(Query){
-    //   fetchSearch(Query);
-    // }
-    // handleLogout();
-    // fetchSearch('');
-  
-}, []);
+
+
 
 
 //for refresh token

@@ -13,7 +13,12 @@ dotenv.config();
 
 const app = express();
 app.use(cookieParser());
-app.use(cors());
+const corsOptions = {
+  origin: 'http://localhost:5173', // Allow only localhost:5173
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // You can specify the allowed methods
+  credentials: true, // Allow cookies to be sent with the request
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(
   session({
