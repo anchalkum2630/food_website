@@ -38,7 +38,6 @@ food_website/
 - ✅ **JWT Authentication with Cookies**
 - ✅ **Browse Recipe Cards**
 - ✅ **Responsive UI (Mobile + Desktop)**
-- ✅ **Add New Recipes**
 - ✅ **Backend API Integration**
 
 ---
