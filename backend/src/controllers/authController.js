@@ -112,6 +112,7 @@ const refreshAccessToken = async (req, res) => {
 
   try {
     const newAccessToken = await refresh_token(token);
+    console.log("in refresh   "+newAccessToken)
     res.status(200).json({ accessToken: newAccessToken });
   } catch (err) {
     res.status(403).json({ message: err.message });

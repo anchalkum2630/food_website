@@ -237,7 +237,7 @@ const loginUser = async (email, password) => {
 
   const accessToken = generateAccessToken({ userId: user.id });
   const refreshToken = generateRefreshToken({ userId: user.id });
-
+  console.log(accessToken+"   "+refreshToken)
   await redisClient.set(`refreshToken:${user.id}`, refreshToken, {
     EX: 7 * 24 * 60 * 60, // 7 days
   });

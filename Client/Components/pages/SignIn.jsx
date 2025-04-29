@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useViewContext } from "../Context/Context_view";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import instance from "../utils/axios.js";
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -57,9 +58,9 @@ const SignIn = () => {
         const apiUrl =
           role === "chef"
             ? "http://localhost:3081/sign_in_chef"
-            : "http://localhost:5000/api/auth/login";
+            : "/api/auth/login";
 
-        const response = await axios.post(apiUrl, formData, {
+        const response = await instance.post(apiUrl, formData, {
           withCredentials: true,
         });
 
