@@ -68,16 +68,16 @@ const SignIn = () => {
         toast.success("Login successful ✅");
         setTimeout(() => {
           navigate("/");
-        }, 3000);
+        }, 2000);
       } catch (error) {
         console.error("Error submitting form:", error.response?.data || error.message);
-        toast.error("User not registered. Redirecting to Register Page.");
+        toast.error("User not registered or password is incorrect. Redirecting to Register Page.");
         setErrors({
           apiError: "Something went wrong. Please try again.",
         });
         setTimeout(() => {
           navigate("/register");
-        }, 3000);
+        }, 2000);
 
       }
     } else {

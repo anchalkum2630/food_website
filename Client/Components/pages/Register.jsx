@@ -80,7 +80,7 @@ const Register = () => {
           : "http://localhost:5000/api/auth/customer/set-password";
       await axios.post(setPasswordApi, { email, password, role });
       toast.success("Registration successful! Redirecting to Sign In.");
-      setTimeout(() => navigate("/SignIn"), 2000);
+      setTimeout(() => navigate("/SignIn"),2000);
     } catch (error) {
       setErrors({ apiError: "Registration failed" });
       toast.error("Failed to complete registration. Please try again.");
