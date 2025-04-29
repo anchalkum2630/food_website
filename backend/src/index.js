@@ -5,7 +5,8 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import session from 'express-session';
-import commonRoutes from './routes/commonRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import customerRoutes from './routes/customerRoutes.js';
 import './config/passportConfig.js'; // 🔥 THIS IS CRITICAL
 
 dotenv.config();
@@ -29,10 +30,13 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session())
 
-app.use('/api/auth',commonRoutes);
+app.use('/api/auth',authRoutes);
+app.use('/api/customer',customerRoutes);
+
+
 
 app.get('/', (req, res) => {
-  res.send('YumRecipe backend is running!');
+  res.send('YumRecipe backend is running..!');
 });
 
 const PORT = process.env.PORT;
