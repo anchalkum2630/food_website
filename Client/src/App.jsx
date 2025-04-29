@@ -1,5 +1,5 @@
 import './index.css';
-import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useLocation,Navigate } from 'react-router-dom';
 import Navbar from '../Components/Navbar';
 import AdminNavbar from '../Components/pages/ADMIN/AdminNavbar'; // Admin Navbar
 import Footer from '../Components/Footer';
@@ -55,6 +55,7 @@ function AppContent() {
         <Route path="/admin/complaints" element={<AdminComplaint />} />
         <Route path="/admin/adminadd" element={<AdminAdd />} />
         <Route path="/google-callback" element={<GoogleCallback />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
       {/* Footer */}

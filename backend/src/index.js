@@ -5,7 +5,6 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import session from 'express-session';
-import customerRoutes from './routes/customerRoutes.js';
 import commonRoutes from './routes/commonRoutes.js';
 import './config/passportConfig.js'; // 🔥 THIS IS CRITICAL
 
@@ -30,7 +29,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session())
 
-app.use('/api/customer', customerRoutes);
 app.use('/api/auth',commonRoutes);
 
 app.get('/', (req, res) => {

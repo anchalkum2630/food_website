@@ -12,10 +12,12 @@ passport.use(
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: process.env.GOOGLE_CALLBACK_URL,
+      passReqToCallback: true, // ✅ This line is required
     },
-    async (accessToken, refreshToken, profile, done) => {
+    async (req,accessToken, refreshToken, profile, done) => {
       try {
-        const user = await findOrCreateUser(profile);
+        const role = req.session.role;
+        const user = await findOrCreateUser(profile,role);
         return done(null, user);
       } catch (err) {
         return done(err, false);

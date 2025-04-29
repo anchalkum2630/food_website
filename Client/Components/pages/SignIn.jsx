@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useViewContext } from "../Context/Context_view";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -11,7 +13,7 @@ const SignIn = () => {
     email: "",
     password: "",
   });
-  const [role, setRole] = useState(""); // Role must be selected
+  const [role, setRole] = useState("");
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
 
@@ -22,9 +24,11 @@ const SignIn = () => {
     if (!formData.email || !emailPattern.test(formData.email)) {
       newErrors.email = "Valid email is required";
     }
+
     if (!formData.password || formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters long";
     }
+
     if (!role) {
       newErrors.role = "Please select a role (Customer or Chef)";
     }
@@ -41,7 +45,7 @@ const SignIn = () => {
   };
 
   const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+    setShowPassword((prev) => !prev);
   };
 
   const handleSubmit = async (e) => {
@@ -53,41 +57,45 @@ const SignIn = () => {
         const apiUrl =
           role === "chef"
             ? "http://localhost:3081/sign_in_chef"
-            : "http://localhost:5000/api/customer/login";
+            : "http://localhost:5000/api/auth/login";
 
         const response = await axios.post(apiUrl, formData, {
           withCredentials: true,
         });
-        localStorage.setItem("accessToken", response.data.token);
-        FetchSavedRecipe();
-        navigate("/");
+
+        const { accessToken, name } = response.data;
+
+        toast.success("Login successful ✅");
+        setTimeout(() => {
+          navigate("/");
+        }, 3000);
       } catch (error) {
-        console.error(
-          "Error submitting form:",
-          error.response?.data || error.message
-        );
+        console.error("Error submitting form:", error.response?.data || error.message);
+        toast.error("User not registered. Redirecting to Register Page.");
         setErrors({
           apiError: "Something went wrong. Please try again.",
         });
+        setTimeout(() => {
+          navigate("/register");
+        }, 3000);
+
       }
     } else {
       setErrors(validationErrors);
     }
   };
 
-  // Step 4: Google Sign-In
   const handleGoogleSignIn = () => {
-  const newErrors = {};
+    const newErrors = {};
+    if (!role) {
+      newErrors.role = "Please select a role";
+      setErrors(newErrors);
+      toast.error("Please select a role before signing in with Google");
+      return;
+    }
 
-  if (!role) {
-    newErrors.role = "Please select a role";
-    setErrors(newErrors); // assuming you have a state to show the error
-    return; // ⛔ stop execution here
-  }
-
-  // ✅ role is selected, proceed to redirect
-  window.location.href = "http://localhost:5000/api/auth/google";
-};
+    window.location.href = `http://localhost:5000/api/auth/google?role=${role}`;
+  };
 
   return (
     <div className="w-full h-screen flex items-center justify-center">
@@ -96,23 +104,18 @@ const SignIn = () => {
         <div className="hidden sm:flex w-1/2 bg-green-700 flex-col items-center justify-center text-gray-100 text-center p-8">
           <h1 className="text-4xl font-bold mb-4">Welcome to YumRecipe!</h1>
           <p className="text-lg">
-            Discover delicious recipes, call top chefs, and enjoy an
-            unforgettable culinary experience.
+            Discover delicious recipes, call top chefs, and enjoy an unforgettable culinary experience.
           </p>
         </div>
 
         {/* Right Side */}
         <div className="w-full lg:w-1/2 p-4 sm:p-8">
-          <h1 className="text-3xl text-green-600 font-bold text-center mb-4">
-            Login
-          </h1>
+          <h1 className="text-3xl text-green-600 font-bold text-center mb-4">Login</h1>
 
           <form onSubmit={handleSubmit} className="space-y-2">
             {/* Role Selection */}
             <div>
-              <label className="block text-sm font-medium text-green-700 mb-1">
-                Select Role
-              </label>
+              <label className="block text-sm font-medium text-green-700 mb-1">Select Role</label>
               <div className="flex gap-6">
                 <label className="flex items-center space-x-2">
                   <input
@@ -144,10 +147,7 @@ const SignIn = () => {
 
             {/* Email Input */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-green-700 mb-1"
-              >
+              <label htmlFor="email" className="block text-sm font-medium text-green-700 mb-1">
                 Email
               </label>
               <input
@@ -168,10 +168,7 @@ const SignIn = () => {
 
             {/* Password Input */}
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-green-700 mb-1"
-              >
+              <label htmlFor="password" className="block text-sm font-medium text-green-700 mb-1">
                 Password
               </label>
               <div className="relative">
@@ -194,9 +191,7 @@ const SignIn = () => {
                 </span>
               </div>
               {errors.password && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.password}
-                </p>
+                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
               )}
               <a href="/reset-password" className="text-gray-500 text-xs">
                 Forgot Password?
@@ -207,7 +202,7 @@ const SignIn = () => {
             <div className="flex justify-center">
               <button
                 type="submit"
-                className="w-[100%] bg-green-600 text-white font-semibold rounded-md shadow-sm p-1 hover:bg-green-900"
+                className="w-full bg-green-600 text-white font-semibold rounded-md shadow-sm p-1 hover:bg-green-900"
               >
                 Submit
               </button>
@@ -218,8 +213,8 @@ const SignIn = () => {
           <div className="mt-4 flex justify-center">
             <button
               type="button"
-              className="w-[100%] bg-white text-gray-700 font-semibold border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 flex items-center justify-center gap-2 p-1"
               onClick={handleGoogleSignIn}
+              className="w-full bg-white text-gray-700 font-semibold border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 flex items-center justify-center gap-2 p-1"
             >
               <img
                 src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -239,6 +234,9 @@ const SignIn = () => {
           </p>
         </div>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer position="top-center" autoClose={5000} />
     </div>
   );
 };

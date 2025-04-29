@@ -1,39 +1,31 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "./axios";
 
-const GoogleCallback = () => {
+function GoogleCallback() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const accessToken = urlParams.get("accessToken");
+    const fetchAccessToken = async () => {
+      try {
+        // Make a request to backend to get new access token using the refresh token (set in cookie)
+        const response = await axios.get("http://localhost:5000/api/auth/refresh_token", {
+          withCredentials: true, // Send cookies including refresh token
+        });
 
-    if (accessToken) {
-      console.log("Got access token:", accessToken);
-
-      // 1. Save accessToken to localStorage
-      localStorage.setItem("accessToken", accessToken);
-
-      // 2. Redirect to homepage (or dashboard)
-      navigate("/");
-    } else {
-      const savedToken = localStorage.getItem("accessToken");
-
-      if (savedToken) {
-        console.log("Already have saved token.");
+        const accessToken = response.data.accessToken;
+        axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
         navigate("/");
-      } else {
-        console.log("No token found, redirecting to SignIn");
-        navigate("/SignIn");
+      } catch (err) {
+        console.error("Failed to get access token", err);
+        navigate("/login"); // or handle failure appropriately
       }
-    }
-  }, []);
+    };
 
-  return (
-    <div className="flex justify-center items-center h-screen">
-      <h1>Logging you in...</h1>
-    </div>
-  );
-};
+    fetchAccessToken();
+  }, [navigate]);
+
+  return <div>Redirecting...</div>;
+}
 
 export default GoogleCallback;
