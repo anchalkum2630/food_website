@@ -3,13 +3,13 @@ import prisma from '../config/prismaConfig.js'; // adjust path to your Prisma cl
 
 export const verifyAccessToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;              // standard header name
-  console.log("verify authheader token "+authHeader)
+  // console.log("verify authheader token "+authHeader)
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ message: 'Access token required' });
   }
   
   const token = authHeader.split(' ')[1];
-  console.log("verify token "+token)
+  // console.log("verify token "+token)
   try {
     // 1. Verify and decode
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);

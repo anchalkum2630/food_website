@@ -8,7 +8,7 @@ import instance from "../utils/axios.js";
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const { setUserName, FetchSavedRecipe } = useViewContext();
+  const { setLogged} = useViewContext();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -65,8 +65,9 @@ const SignIn = () => {
         });
 
         const { accessToken, name } = response.data;
-
+        console.log(response.data)
         toast.success("Login successful ✅");
+        setLogged(true)
         setTimeout(() => {
           navigate("/");
         }, 2000);

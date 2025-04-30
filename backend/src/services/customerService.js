@@ -15,23 +15,26 @@ export const updateCustomerProfileService = async (userId, data) => {
     phoneNo,
     gender,
     picUrl,
+    country,
     address,
     addressCity,
     addressState,
     addressPincode,
   } = data;
-
+  // console.log(data)
   const fieldsToUpdate = {};
   if (name !== undefined) fieldsToUpdate.name = name;
   if (phoneNo !== undefined) fieldsToUpdate.phoneNo = phoneNo;
   if (gender !== undefined) fieldsToUpdate.gender = gender;
   if (picUrl !== undefined) fieldsToUpdate.picUrl = picUrl;
+  if (country !== undefined) fieldsToUpdate.country = country;
   if (address !== undefined) fieldsToUpdate.address = address;
   if (addressCity !== undefined) fieldsToUpdate.addressCity = addressCity;
   if (addressState !== undefined) fieldsToUpdate.addressState = addressState;
   if (addressPincode !== undefined) fieldsToUpdate.addressPincode = addressPincode;
-
-  const updatedUser = await prisma.user.update({
+  // console.log("field update:   ");
+  // console.log(fieldsToUpdate)
+  const updatedUser = await prisma.User.update({
     where: { id: userId },
     data: fieldsToUpdate,
   });

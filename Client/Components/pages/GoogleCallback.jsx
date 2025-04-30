@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import instance from "../utils/axios.js";
+import { useViewContext } from "../Context/Context_view.jsx";
 
 function GoogleCallback() {
   const navigate = useNavigate();
+  const { setLogged } = useViewContext();
 
   useEffect(() => {
     const fetchAccessToken = async () => {
@@ -14,6 +16,7 @@ function GoogleCallback() {
         });
 
         const accessToken = response.data.accessToken;
+        setLogged(true)
         console.log(accessToken)
         localStorage.setItem("accessToken", accessToken);
         instance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;

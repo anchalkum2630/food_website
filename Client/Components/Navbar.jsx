@@ -11,7 +11,7 @@ import { useViewContext } from './Context/Context_view';
 
 const Navbar = () => {
 
-    const {item,UserName,userProfile,FetchSavedRecipe,fetchSearch,handleprofile,handleLogout}=useViewContext();
+    const {logged,item,UserName,userProfile,FetchSavedRecipe,fetchSearch,handleprofile,handleLogout}=useViewContext();
 
     const [sideNav, setSideNav] = useState(false);
     
@@ -41,16 +41,16 @@ const Navbar = () => {
                     </Link>
                 </div>
                 <div className="flex gap-5 items-center">
-                    {!UserName?(<Link to="/SignIn">
+                    {!logged?(<Link to="/SignIn">
                         <p className="hidden sm:flex hover:text-blue-500 text-[20px] my-3 font-bold">Sign In</p>
                     </Link>) 
                     :
                     (<>
                     <Link to="/UserProfile">
-                    <img src={userProfile.profile_pic||"https://i.pinimg.com/736x/bc/c7/41/bcc7416a37b874426e201c2506056a1c.jpg"} 
+                    <img src={"https://i.pinimg.com/736x/bc/c7/41/bcc7416a37b874426e201c2506056a1c.jpg"} 
                     alt="profilePic" 
                     className='w-12 h-12 rounded-full border image-resize mx-auto'
-                    title={UserName} onClick={()=>handleprofile()}/>
+                    title="user" />
                     </Link>
                     <Link to="/viewReceipe">
                     <p className='absolute top-0 right-24 hidden sm:flex text-blue-500 font-bold'>{item}</p>
@@ -77,7 +77,7 @@ const Navbar = () => {
                             <Link to="/OurFood" onClick={handleChange}>
                                 <li className="hover:text-blue-500">Our Recipe</li>
                             </Link>
-                            {!UserName?(
+                            {!logged?(
                             <Link to="/SignIn" onClick={handleChange}>
                                 <li className="hover:text-blue-500">Sign In</li>
                             </Link>):(<>
