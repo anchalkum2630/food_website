@@ -7,6 +7,7 @@ import passport from 'passport';
 import session from 'express-session';
 import authRoutes from './routes/authRoutes.js';
 import customerRoutes from './routes/customerRoutes.js';
+import recipeRoutes from './routes/recipeRoutes.js';
 import './config/passportConfig.js'; // 🔥 THIS IS CRITICAL
 
 dotenv.config();
@@ -32,6 +33,7 @@ app.use(passport.session())
 
 app.use('/api/auth',authRoutes);
 app.use('/api/customer',customerRoutes);
+app.use('/api/recipe',recipeRoutes);
 
 
 

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useViewContext } from "../Context/Context_view";
 import { toast, ToastContainer } from "react-toastify";
@@ -103,7 +102,7 @@ const SignIn = () => {
     <div className="w-full h-screen flex items-center justify-center">
       <div className="flex flex-col sm:flex-row w-[90%] lg:w-[70%] h-auto lg:h-[70%] mt-10 bg-white shadow-lg rounded-2xl overflow-hidden">
         {/* Left Side */}
-        <div className="hidden sm:flex w-1/2 bg-green-700 flex-col items-center justify-center text-gray-100 text-center p-8">
+        <div className="hidden sm:flex w-1/2 bg-green-600 flex-col items-center justify-center text-gray-100 text-center p-8">
           <h1 className="text-4xl font-bold mb-4">Welcome to YumRecipe!</h1>
           <p className="text-lg">
             Discover delicious recipes, call top chefs, and enjoy an unforgettable culinary experience.

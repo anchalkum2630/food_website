@@ -66,20 +66,29 @@ const UserProfile = () => {
   const formattedDate = new Date(user.createdAt).toLocaleDateString();
 
   const validateFields = () => {
-    const newErrors = {};
+  const newErrors = {};
 
-    if (!user.name || user.name.length < 3) newErrors.name = "Name must be at least 3 characters.";
-    if (!user.gender) newErrors.gender = "Gender is required.";
-    if (!user.phoneNo || !/^\d{10}$/.test(user.phoneNo)) newErrors.phoneNo = "Enter a valid 10-digit phone number.";
-    if (!user.country) newErrors.country = "Country is required.";
-    if (!user.addressState) newErrors.addressState = "State is required.";
-    if (!user.addressCity) newErrors.addressCity = "City is required.";
-    if (!user.address || user.address.length < 5) newErrors.address = "Address must be at least 5 characters.";
-    if (!user.addressPincode || !/^\d{5,10}$/.test(user.addressPincode)) newErrors.addressPincode = "Enter a valid pincode.";
+  if (user.name && user.name.length < 3)
+    newErrors.name = "Name must be at least 3 characters.";
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  if (user.phoneNo && !/^\d{10}$/.test(user.phoneNo))
+    newErrors.phoneNo = "Enter a valid 10-digit phone number.";
+
+  if (user.address && user.address.length < 5)
+    newErrors.address = "Address must be at least 5 characters.";
+
+  if (user.addressPincode && !/^\d{5,10}$/.test(user.addressPincode))
+    newErrors.addressPincode = "Enter a valid pincode.";
+
+  // Optional: If you want to enforce dependencies
+  if (user.addressCity && (!user.country || !user.addressState)) {
+    newErrors.addressCity = "Select Country and State first.";
+  }
+
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
 
   const handleEdit = () => {
     if (isEditing) {
