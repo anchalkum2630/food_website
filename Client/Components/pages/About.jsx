@@ -4,7 +4,7 @@ const AboutUs = () => {
     <div className='mt-10'>
     <div className="w-full max-w-6xl mx-auto p-6 sm:p-8 lg:p-12 font-semibold">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-green-700 mb-4">About Us</h1>
+        {/* <h1 className="text-4xl font-bold text-green-700 mb-4">About Us</h1> */}
         <p className="text-lg text-gray-700 leading-relaxed">
           Welcome to our food app, your gateway to exploring the vibrant and diverse world of Indian cuisine. Our app is designed to deliver the rich flavors, aromas, and textures of traditional Indian food directly to your doorsteps, bringing an authentic taste of India to your everyday life.
         </p>

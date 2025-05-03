@@ -7,25 +7,38 @@ import {
 } from '../services/recipeService.js';
 
 export const getPublicRecipes = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 2;
+  const search = req.query.search || '';
+  console.log("page : ",page," limit : ",limit," search : ",search)
+
   try {
-    const filters = req.query;
-    const recipes = await getRecipes({ isLoggedIn: false, filters });
-    res.status(200).json({ success: true, data: recipes });
+    const data = await getRecipes({ isLoggedIn: false, userId: null, filters: { page, limit, search } });
+
+    return res.status(200).json({ data });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.log(err);
+    return res.status(500).json({ error: err.message });
   }
 };
 
+
 export const getPrivateRecipes = async (req, res) => {
   try {
-    const filters = req.query;
+    const { page = 1, limit = 2, search } = req.query; // Receive page and limit from query params
+    const filters = { page, limit, search };
     const userId = req.user.id;
+
+    console.log("Filters Received:", filters); // Debugging to verify received filters
+
     const recipes = await getRecipes({ isLoggedIn: true, userId, filters });
     res.status(200).json({ success: true, data: recipes });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+
 
 export const getSavedRecipeId = async (req, res) => {
   try {

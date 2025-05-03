@@ -1,86 +1,144 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import instance from '../utils/axios';
 import { useViewContext } from '../Context/Context_view';
 import FoodData from '../FoodData';
 
 const OurFood = () => {
-  const {handleAdd,Recipe,fetchSearch,handleData,close,UserName}=useViewContext();
-  const [searchFood,setsearchFood]=useState('');
-  const handleSearch = (e) => {
-    setsearchFood(e.target.value);
-    // fetchSearch(e.target.value); // Fetch recipes based on search query
-  };
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      localStorage.setItem("setQuery",searchFood);
-      fetchSearch(searchFood);  // Trigger search when Enter is pressed
-    }
-  };
-  useEffect(() => {
-    const savedQuery = localStorage.getItem('setQuery');
-    if (savedQuery) {
-      setsearchFood(savedQuery); // Set the search term in the state
-      fetchSearch(savedQuery); // Trigger search for the saved query
-    }
-  }, []);
+  const { handleAdd, handleData, close } = useViewContext();
+  const [UserName, setUserName] = useState(false);
+  const [recipes, setRecipes] = useState([]);
+  const [searchFood, setSearchFood] = useState('');
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-if (Recipe.length === 0) {
-    return (
-      <>
-       <div className='flex justify-between w-[90%] mx-auto mt-20'>
-          <h2 className='text-center text-green-700 text-3xl font-bold py-5'>Our Recipe</h2>
-          <input
-           type="text"
-           value={searchFood}
-           name="searchFood"
-           className='block text-lg font-bold text-gray-700 mb-4 w-[30%] mt-4 rounded-3xl text-center border-blue-500 border-2 focus:ring-yellow-500 focus:outline-none focus:border-yellow-500 focus:border-2'
-           placeholder='Search recipe'
-           onChange={handleSearch}
-           onKeyDown={handleKeyDown}
-           />
-        </div>
-      <p className='w-[90%] mx-auto mt-44 mb-48 text-center text-3xl'>No recipes found.</p>
-    </>
-    )
-  }
+  const LIMIT = 8;
+  const observer = useRef();
+
+  const lastRecipeRef = useCallback(
+    node => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage(prev => prev + 1);
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore]
+  );
+
+  const fetchRecipes = async (pageNum = 1, search = '') => {
+    setLoading(true);
+    try {
+      const endpoint = UserName
+        ? `/api/recipe/private?page=${pageNum}&search=${search}&limit=${LIMIT}`
+        : `/api/recipe/public?page=${pageNum}&search=${search}&limit=${LIMIT}`;
+      const res = await instance.get(endpoint, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
+      });
+
+      const data = res.data.data || [];
+      if (data.length === 0) {
+        setHasMore(false);
+      } else {
+        setRecipes(prev => (pageNum === 1 ? data : [...prev, ...data]));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const savedQuery = localStorage.getItem('setQuery') || '';
+    setSearchFood(savedQuery);
+    setPage(1);
+    setRecipes([]);
+    setHasMore(true);
+    fetchRecipes(1, savedQuery);
+  }, [UserName]);
+
+  useEffect(() => {
+    if (page > 1) fetchRecipes(page, searchFood);
+  }, [page]);
+
+  const handleSearch = e => setSearchFood(e.target.value);
+  const handleKeyDown = e => {
+    if (e.key === 'Enter') {
+      localStorage.setItem('setQuery', searchFood);
+      setPage(1);
+      setRecipes([]);
+      setHasMore(true);
+      fetchRecipes(1, searchFood);
+    }
+  };
 
   return (
-    <>
-      <div className='w-[90%] m-auto mt-20'>
-        <div className='flex justify-between'>
-          <h2 className='text-center text-green-700 text-3xl font-bold py-5'>Our Recipe</h2>
-          <input
-           type="text"
-           value={searchFood}
-           name="searchFood"
-           className='block text-lg font-bold text-gray-700 mb-4 w-[30%] mt-4 rounded-3xl text-center border-blue-500 border-2 focus:ring-yellow-500 focus:outline-none focus:border-yellow-500 focus:border-2'
-           placeholder='Search recipe'
-           onChange={handleSearch}
-           onKeyDown={handleKeyDown}
-           />
-        </div>
+    <div className='relative w-[90%] m-auto'>
+      {/* Fixed Search Bar */}
+      <div className='fixed top-0 left-0 right-0 bg-[rgb(251,246,246)] z-50 p-6 mt-16'>
+   <div className='flex justify-center items-center'>
+      <input
+        type='text'
+        value={searchFood}
+        onChange={handleSearch}
+        onKeyDown={handleKeyDown}
+        placeholder='Search recipe'
+        className='text-lg font-bold text-gray-700 w-[30%] rounded-3xl text-center border-blue-500 border-2 focus:ring-yellow-500 focus:outline-none focus:border-yellow-500'
+      />
+    </div>
+</div>
 
-        <div className='grid sm:grid-cols-2 lg:grid-cols-4 gap-4'>
-          {Recipe.map((item) => (
-            <div key={item.id} className='justify-center group'>
-              <img src={item.image_url} alt={item.name} className='w-[90%] h-48 rounded-lg image-resize mx-auto transform transition-transform duration-300 group-hover:scale-110' />
-              <div className='flex justify-center py-2 px-4 flex-col items-center'>
+      {/* Recipe Grid with top padding equal to search bar height */}
+      <div className='pt-40 grid sm:grid-cols-2 lg:grid-cols-4 gap-4'>
+        {recipes.length === 0 && !loading && (
+          <p className='text-center col-span-full text-2xl'>No recipes found.</p>
+        )}
+
+        {recipes.map((item, index) => {
+          const isLast = recipes.length === index + 1;
+          return (
+            <div
+              ref={isLast ? lastRecipeRef : null}
+              key={`${item.id}-${index}`}
+              className='justify-center group'
+            >
+              <img
+                src={item.imageUrl}
+                alt={item.name}
+                className='w-[90%] h-48 rounded-lg mx-auto transform transition-transform duration-300 group-hover:scale-110'
+              />
+              <div className='flex flex-col items-center py-2 px-4'>
                 <p className='text-[20px] line-clamp-1'>{item.name}</p>
-                <p className='text-blue-500 mt-2' >{item.prep_time}in</p>                  
+                <p className='text-blue-500 mt-2'>{item.prepTime}min</p>
                 <div className='flex'>
-                  {UserName?<button className='bg-black w-[100px] text-white rounded-md my-6 mr-4 py-[10px] text-[15px] hover:text-yellow-500 ' onClick={()=>handleAdd(item.id)}>
-                    CookBook
-                  </button>:null}
-                <button className='bg-black w-[100px] text-white rounded-md my-6 ml-4 py-[10px] text-[15px] hover:text-yellow-500' onClick={()=>handleData(item.id)}>
+                  {UserName && (
+                    <button
+                      className='bg-black w-[100px] text-white rounded-md my-6 mr-4 py-[10px] text-[15px] hover:text-yellow-500'
+                      onClick={() => handleAdd(item.id)}
+                    >
+                      CookBook
+                    </button>
+                  )}
+                  <button
+                    className='bg-black w-[100px] text-white rounded-md my-6 ml-4 py-[10px] text-[15px] hover:text-yellow-500'
+                    onClick={() => handleData(item.id)}
+                  >
                     More
-                </button>
+                  </button>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-        {close && <FoodData/>}
+          );
+        })}
       </div>
-    </>
+
+      {loading && <p className='text-center text-lg mt-10'>Loading...</p>}
+      {close && <FoodData />}
+    </div>
   );
 };
 
