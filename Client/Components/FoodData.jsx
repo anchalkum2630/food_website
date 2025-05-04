@@ -25,23 +25,23 @@ const FoodData = () => {
       <div className='fixed inset-0 flex justify-center backdrop-blur sm:bg-opacity-50 mt-10'>
         <div className='bg-white  p-4 opacity-100 w-[80%] max-w-3xl h-[80vh] overflow-hidden mt-20'>
           <div className='overflow-y-scroll scrollbar-hide h-full'>
-            <div key={foodDetail[0].id} className='justify-center p-4'>
+            <div key={foodDetail.id} className='justify-center p-4'>
               <ImCross className='text-red-600 ml-auto cursor-pointer' onClick={onClose} />
-              <img src={foodDetail[0].image_url} alt={foodDetail[0].name} className='sm:w-[50%] h-48 rounded-lg image-resize mx-auto' />
+              <img src={foodDetail.imageUrl} alt={foodDetail.name} className='sm:w-[50%] h-48 rounded-lg image-resize mx-auto' />
               <div className='flex justify-center py-2 px-4 flex-col items-center'>
-                <p className='text-[20px]'><u>{foodDetail[0].name}</u></p>
-                <p className='text-blue-500 mt-2'>{foodDetail[0].prep_time}in</p>
+                <p className='text-[20px]'><u>{foodDetail.name}</u></p>
+                <p className='text-blue-500 mt-2'>{foodDetail.prepTime}in</p>
                 <div className='flex justify-center'>
-                  <p className='border border-black m-4 px-2'>{foodDetail[0].cuisine}</p>
-                  <p className='border border-black m-4 px-2'>{foodDetail[0].course}</p>
-                  <p className='border border-black m-4 px-2'>{foodDetail[0].diet}</p>
+                  <p className='border border-black m-4 px-2'>{foodDetail.cuisine}</p>
+                  <p className='border border-black m-4 px-2'>{foodDetail.course}</p>
+                  <p className='border border-black m-4 px-2'>{foodDetail.diet}</p>
                 </div>
                 <p className='m-2'><b><u>Description</u></b></p>
-                <p>{foodDetail[0].description}</p>
+                <p>{foodDetail.description}</p>
                 <p className='m-2'><b><u>Ingredients</u></b></p>
-                <p>{foodDetail[0].ingredients}</p>
+                <p>{foodDetail.ingredients}</p>
                 <p className='m-2'><b><u>Instructions</u></b></p>
-                <p>{foodDetail[0].instructions}</p>
+                <p>{foodDetail.instruction}</p>
               </div>
             </div>
           </div>

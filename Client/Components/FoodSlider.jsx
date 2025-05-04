@@ -5,7 +5,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useViewContext } from './Context/Context_view';
 const FoodSlider = () => {
-  const {handleAdd,Favourite}=useViewContext();
+  const {handleAdd,favourites}=useViewContext();
   const settings = {
     dots: true,
     infinite: true,
@@ -48,9 +48,9 @@ const FoodSlider = () => {
       <h2 className='font-bold text-3xl text-center'>What's On Your Mind?</h2>
       <div className='py-20 justify-center items-center'>
       <Slider {...settings}>
-         {Favourite.slice(0,13).map((item) => (
+         {favourites.slice(0,13).map((item) => (
             <div key={item.id} className='justify-center px-2'>
-              <img src={item.image_url} alt={item.name} className='w-full h-48 rounded-lg image-resize' />
+              <img src={item.imageUrl} alt={item.name} className='w-full h-48 rounded-lg image-resize' />
               <div className='flex justify-center py-2 px-4 flex-col items-center'>
                 <p className='text-[20px] line-clamp-1'>{item.name}</p>
                 <p>{item.prep_time}</p>

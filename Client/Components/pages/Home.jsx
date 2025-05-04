@@ -7,13 +7,13 @@ import {useViewContext } from '../Context/Context_view'
 
 const Home = () => {
 
-  const {UserName}=useViewContext();
+  const {logged}=useViewContext();
 
   return (
     <div>
       <Head/>
       <Delivery/>
-      {UserName ? <FoodSlider /> : null}
+      {/* {logged ? <FoodSlider /> : null} */}
       <FeedBack/>
     </div>
   )

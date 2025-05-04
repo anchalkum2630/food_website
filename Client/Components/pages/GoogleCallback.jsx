@@ -5,7 +5,7 @@ import { useViewContext } from "../Context/Context_view.jsx";
 
 function GoogleCallback() {
   const navigate = useNavigate();
-  const { setLogged } = useViewContext();
+  const { setLogged ,fetchFavourites} = useViewContext();
 
   useEffect(() => {
     const fetchAccessToken = async () => {
@@ -16,9 +16,10 @@ function GoogleCallback() {
         });
 
         const accessToken = response.data.accessToken;
-        setLogged(true)
+        // fetchFavourites();
+        setLogged(true);
         console.log(accessToken)
-        localStorage.setItem("accessToken", accessToken);
+        // localStorage.setItem("accessToken", accessToken);
         instance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
         navigate("/");
       } catch (err) {

@@ -4,7 +4,7 @@ const AboutUs = () => {
     <div className='mt-10'>
     <div className="w-full max-w-6xl mx-auto p-6 sm:p-8 lg:p-12 font-semibold">
       <div className="text-center mb-8">
-        {/* <h1 className="text-4xl font-bold text-green-700 mb-4">About Us</h1> */}
+        {/*  <h1 className="text-4xl font-bold text-green-700 mb-4">About Us</h1> */}
         <p className="text-lg text-gray-700 leading-relaxed">
           Welcome to our food app, your gateway to exploring the vibrant and diverse world of Indian cuisine. Our app is designed to deliver the rich flavors, aromas, and textures of traditional Indian food directly to your doorsteps, bringing an authentic taste of India to your everyday life.
         </p>
@@ -22,7 +22,7 @@ const AboutUs = () => {
           </p>
           
           <p className="text-lg text-gray-700 mb-4">
-            Our mission is to make high-quality Indian food accessible and enjoyable for everyone. We strive to offer an exceptional dining experience, whether you’re ordering for a quick lunch, planning a family dinner, or hosting a special event. Our user-friendly app ensures that you can easily explore our menu, customize your orders, and have your favorite dishes delivered right to your door with just a few clicks.
+            Our mission is to make high-quality Indian food accessible and enjoyable for everyone. We strive to offer an exceptional dining experience, whether you're ordering for a quick lunch, planning a family dinner, or hosting a special event. Our user-friendly app ensures that you can easily explore our menu, customize your orders, and have your favorite dishes delivered right to your door with just a few clicks.
           </p>
           <p className="text-lg text-gray-700 mb-4">
             We believe that food is not just sustenance; it's a celebration of culture, tradition, and community. That’s why we are committed to providing you with not only delicious meals but also a warm and memorable experience that connects you with the rich traditions of Indian cuisine.
