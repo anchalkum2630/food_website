@@ -14,7 +14,16 @@ export const getCustomerProfile = async (req, res) => {
 
 export const updateCustomerProfile = async (req, res) => {
   try {
-    const updated = await updateCustomerProfileService(req.user.id, req.body);
+    const profileData = {
+      ...req.body,
+      // If file is uploaded, add picUrl from Cloudinary
+      picUrl: req.file?.path,
+    };
+    // console.log(profileData)
+
+    const updated = await updateCustomerProfileService(req.user.id, profileData);
+    // console.log("updated :  ")
+    // console.log(updated)
     res.json({
       message: 'Profile updated successfully',
       user: updated,

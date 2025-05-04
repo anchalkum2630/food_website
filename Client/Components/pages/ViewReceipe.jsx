@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import instance from '../utils/axios';
+// import instance from '../utils/axios';
+import axios from 'axios';
 import { useViewContext } from '../Context/Context_view.jsx';
 import { FaWhatsapp } from 'react-icons/fa'; // Import the WhatsApp icon
 import FoodData from '../FoodData';
 
 const ViewReceipe = () => {
-  const { close, handleData, logged, addedRecipes, setAddedRecipes, favourites, setFavourites } = useViewContext();
+  const { close, handleData, logged, addedRecipes, setAddedRecipes, favourites, setFavourites ,token} = useViewContext();
   const navigate = useNavigate();
 
   // Redirect if not logged in
@@ -20,7 +21,11 @@ const ViewReceipe = () => {
   useEffect(() => {
     const fetchFavourites = async () => {
       try {
-        const res = await instance.get(`/api/recipe/private/saved`);
+        const res = await axios.get(`http://localhost:5000/api/recipe/private/saved`,{
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+});
         setFavourites(res.data.data);
         console.log(res.data);
       } catch (err) {
@@ -36,7 +41,12 @@ const ViewReceipe = () => {
   // Remove recipe
   const handleRemove = async (id) => {
     try {
-      const res = await instance.delete('/api/recipe/private/saved', {
+      const res = await axios.delete('http://localhost:5000/api/recipe/private/saved', {
+        
+  headers: {
+    Authorization: `Bearer ${token}`
+  },
+
         data: { recipeId: id },
         withCredentials: true
       });

@@ -52,7 +52,7 @@ const setPassword = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const { name, accessToken, refreshToken } = await loginUser(email, password);
+    const { name, accessToken, refreshToken ,image } = await loginUser(email, password);
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -61,7 +61,7 @@ const login = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
     console.log(accessToken)
-    res.status(200).json({ accessToken, name });
+    res.status(200).json({ accessToken, name, image});
   } catch (error) {
     res.status(401).json({ message: error.message });
   }
@@ -73,6 +73,7 @@ const googleAuthInitiate = (req, res, next) => {
   req.session.role = role;
   passport.authenticate("google", {
     scope: ["profile", "email"],
+     prompt: 'select_account',
     state: role,
   })(req, res, next);
 };
@@ -81,7 +82,7 @@ const googleAuthInitiate = (req, res, next) => {
 const googleCallbackController = async (req, res) => {
   try {
     const user = req.user;
-    const accessToken = generateAccessToken({ userId: user.id });
+    // const accessToken = generateAccessToken({ userId: user.id });
     const refreshToken = generateRefreshToken({ userId: user.id });
 
     await redisClient.set(`refreshToken:${user.id}`, refreshToken, {
@@ -111,9 +112,9 @@ const refreshAccessToken = async (req, res) => {
   if (!token) return res.status(401).json({ message: 'Refresh token missing' });
 
   try {
-    const newAccessToken = await refresh_token(token);
-    console.log("in refresh   "+newAccessToken)
-    res.status(200).json({ accessToken: newAccessToken });
+    const {accessToken,picUrl} = await refresh_token(token);
+    // console.log("in refresh  access  "+accessToken+" image :"+picUrl)
+    res.status(200).json({ accessToken: accessToken,picUrl:picUrl });
   } catch (err) {
     res.status(403).json({ message: err.message });
   }

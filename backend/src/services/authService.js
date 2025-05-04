@@ -153,7 +153,23 @@ export const refresh_token = async (Token) => {
     throw new Error('Invalid or expired refresh token');
   }
 
-  return generateAccessToken({ userId });
+   // Step 3: Get the user data (including picUrl) from the database
+  const user = await prisma.user.findUnique({
+      where: { id: userId }, // Fetch the user by ID
+    });
+    // console.log('Fetched User:', user);
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  // Step 4: Generate a new access token
+  const accessToken = generateAccessToken({ userId: user.id });
+
+  // Step 5: Return the access token and the user's picUrl
+  return {
+    accessToken,
+    picUrl: user.picUrl, // Assuming `picUrl` is stored in your user object
+  };
 };
 
 // ✅ Registration: Generate and send OTP
@@ -241,8 +257,8 @@ const loginUser = async (email, password) => {
   await redisClient.set(`refreshToken:${user.id}`, refreshToken, {
     EX: 7 * 24 * 60 * 60, // 7 days
   });
-
-  return { accessToken, refreshToken, name: user.name };
+  //  console.log(user.picUrl);
+  return { accessToken, refreshToken, name: user.name, image:user.picUrl };
 };
 
 export {

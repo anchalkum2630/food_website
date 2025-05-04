@@ -11,7 +11,7 @@ import { useViewContext } from './Context/Context_view';
 
 const Navbar = () => {
 
-    const {logged,item,UserName,userProfile,FetchSavedRecipe,fetchSearch,handleprofile,handleLogout}=useViewContext();
+    const {logged,item,UserName,userProfile,FetchSavedRecipe,fetchSearch,handleprofile,profilepic,handleLogout}=useViewContext();
 
     const [sideNav, setSideNav] = useState(false);
     
@@ -47,7 +47,7 @@ const Navbar = () => {
                     :
                     (<>
                     <Link to="/UserProfile">
-                    <img src={"https://i.pinimg.com/736x/bc/c7/41/bcc7416a37b874426e201c2506056a1c.jpg"} 
+                    <img src={profilepic||"https://i.pinimg.com/736x/bc/c7/41/bcc7416a37b874426e201c2506056a1c.jpg"} 
                     alt="profilePic" 
                     className='w-12 h-12 rounded-full border image-resize mx-auto'
                     title="user" />

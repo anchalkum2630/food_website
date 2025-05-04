@@ -4,10 +4,11 @@ import { useViewContext } from "../Context/Context_view";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import instance from "../utils/axios.js";
+import axios from 'axios';
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const { setLogged,fetchFavourites} = useViewContext();
+  const { setLogged,token,setProfilepic} = useViewContext();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -57,16 +58,22 @@ const SignIn = () => {
         const apiUrl =
           role === "chef"
             ? "http://localhost:3081/sign_in_chef"
-            : "/api/auth/login";
+            : "http://localhost:5000/api/auth/login";
 
-        const response = await instance.post(apiUrl, formData, {
+        const response = await axios.post(apiUrl, formData, {
           withCredentials: true,
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+
         });
 
-        const { accessToken, name } = response.data;
+        const { accessToken, image } = response.data;
         console.log(response.data)
+        localStorage.setItem("accessToken",accessToken);
         toast.success("Login successful ✅");
-        // fetchFavourites();
+        setProfilepic(image);
+        console.log(image)
         setLogged(true)
         setTimeout(() => {
           navigate("/");

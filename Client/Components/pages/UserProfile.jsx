@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from "react";
-import instance from "../utils/axios";
+import axios from "axios";
 import { Country, State, City } from "country-state-city";
 import {
   FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt,
   FaTransgender, FaFlag, FaCity, FaHashtag, FaCalendarAlt
 } from "react-icons/fa";
+import { useViewContext } from "../Context/Context_view.jsx";
 
-// Reusable Detail component to render individual fields
 const Detail = ({ label, value, Icon, fieldName, options = [], editable, onChange, error }) => {
   return (
     <div className="flex items-start gap-4 p-5 rounded-xl bg-white shadow-lg border border-green-100">
-      <div className="text-green-700 text-2xl mt-1">
-        <Icon />
-      </div>
+      <div className="text-green-700 text-2xl mt-1"><Icon /></div>
       <div className="w-full">
         <p className="text-sm text-gray-500 font-medium mb-1">{label}</p>
         {editable && options.length > 0 ? (
@@ -50,55 +48,67 @@ const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [errors, setErrors] = useState({});
+  const [selectedImage, setSelectedImage] = useState(null);
+  const { token,setProfilepic} = useViewContext();
 
   useEffect(() => {
-    instance.get("/api/customer/profile")
-      .then((res) => setUser(res.data))
-      .catch((err) => console.error("Failed to fetch user data", err));
-  }, []);
+  axios.get("http://localhost:5000/api/customer/profile", {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+    .then(res => {
+      setUser(res.data); // Assuming res.data is the full user object
+      if (res.data.picUrl) {
+        setProfilepic(res.data.picUrl); // Set profile pic
+      }
+    })
+    .catch(err => console.error("Failed to fetch user data", err));
+}, [isEditing]);
 
-  if (!user) return <div className="text-center mt-10">Loading...</div>;
 
   const countryList = Country.getAllCountries();
-  const stateList = user.country ? State.getStatesOfCountry(user.country) : [];
-  const cityList = user.country && user.addressState ? City.getCitiesOfState(user.country, user.addressState) : [];
-
-  const formattedDate = new Date(user.createdAt).toLocaleDateString();
+  const stateList = user?.country ? State.getStatesOfCountry(user.country) : [];
+  const cityList = user?.country && user?.addressState ? City.getCitiesOfState(user.country, user.addressState) : [];
+  const formattedDate = user ? new Date(user.createdAt).toLocaleDateString() : "";
 
   const validateFields = () => {
-  const newErrors = {};
+    const newErrors = {};
+    if (user.name && user.name.length < 3) newErrors.name = "Name must be at least 3 characters.";
+    if (user.phoneNo && !/^\d{10}$/.test(user.phoneNo)) newErrors.phoneNo = "Enter a valid 10-digit phone number.";
+    if (user.address && user.address.length < 5) newErrors.address = "Address must be at least 5 characters.";
+    if (user.addressPincode && !/^\d{5,10}$/.test(user.addressPincode)) newErrors.addressPincode = "Enter a valid pincode.";
+    if (user.addressCity && (!user.country || !user.addressState)) newErrors.addressCity = "Select Country and State first.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-  if (user.name && user.name.length < 3)
-    newErrors.name = "Name must be at least 3 characters.";
-
-  if (user.phoneNo && !/^\d{10}$/.test(user.phoneNo))
-    newErrors.phoneNo = "Enter a valid 10-digit phone number.";
-
-  if (user.address && user.address.length < 5)
-    newErrors.address = "Address must be at least 5 characters.";
-
-  if (user.addressPincode && !/^\d{5,10}$/.test(user.addressPincode))
-    newErrors.addressPincode = "Enter a valid pincode.";
-
-  // Optional: If you want to enforce dependencies
-  if (user.addressCity && (!user.country || !user.addressState)) {
-    newErrors.addressCity = "Select Country and State first.";
-  }
-
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
-
-
-  const handleEdit = () => {
+  const handleEdit = async () => {
     if (isEditing) {
-      if (validateFields()) {
-        instance.put("/api/customer/profile", user)
-          .then(() => {
-            alert("Profile updated successfully");
-            setIsEditing(false);
-          })
-          .catch(() => alert("Error updating profile"));
+      if (!validateFields()) return;
+
+      const formData = new FormData();
+      Object.entries(user).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+
+      if (selectedImage) {
+        formData.append("pic", selectedImage);
+      }
+
+      try {
+        const res = await axios.put("http://localhost:5000/api/customer/profile", formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data"
+          }
+        });
+
+        setUser(res.data);
+        alert("Profile updated successfully");
+        setIsEditing(false);
+        setSelectedImage(null);
+      } catch (error) {
+        console.error("Error updating profile", error);
+        alert("Failed to update profile");
       }
     } else {
       setIsEditing(true);
@@ -108,19 +118,41 @@ const UserProfile = () => {
   const handleChange = (e, fieldName) => {
     const { value } = e.target;
     setUser(prev => ({ ...prev, [fieldName]: value }));
-    setErrors(prev => ({ ...prev, [fieldName]: "" })); // clear error on change
+    setErrors(prev => ({ ...prev, [fieldName]: "" }));
   };
+
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUser(prev => ({ ...prev, picUrl: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  if (!user) return <div className="text-center mt-10">Loading...</div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-tr flex items-center justify-center px-4 py-10 mt-10">
       <div className="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl max-w-6xl w-full grid grid-cols-1 md:grid-cols-3">
+        {/* Profile Sidebar */}
         <div className="bg-gradient-to-b from-green-700 to-emerald-600 p-10 flex flex-col items-center text-white rounded-3xl">
-          <div className="w-56 h-56 rounded-full overflow-hidden border-4 border-white shadow-md">
-            <img src={user.picUrl} alt="Profile" className="w-full h-full object-cover" />
+          <div className="w-56 h-56 rounded-full overflow-hidden border-4 border-white shadow-md relative">
+            <img src={user.picUrl || "https://i.pinimg.com/736x/bc/c7/41/bcc7416a37b874426e201c2506056a1c.jpg"} alt="Profile" className="w-full h-full object-cover" />
+            {isEditing && (
+              <label className="absolute bottom-0 left-0 right-0 text-center bg-black/40 text-sm py-1 cursor-pointer">
+                <input type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
+                Upload Photo
+              </label>
+            )}
           </div>
           <h2 className="mt-6 text-3xl font-bold text-center">{user.name}</h2>
         </div>
 
+        {/* Profile Details */}
         <div className="col-span-2 p-10 bg-white space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="text-2xl font-bold text-green-700">Profile Details</h3>

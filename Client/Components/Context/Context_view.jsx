@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState,useEffect } from 'react';
 import instance from '../utils/axios';
+import axios from 'axios';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 // Create context
@@ -15,24 +16,38 @@ const ViewProvider = ({ children }) => {
   const [close,setClose]=useState(false);
   const [addedRecipes, setAddedRecipes] = useState([]);
   const [favourites, setFavourites] = useState([]);
-
+  const [profilepic,setProfilepic] = useState(null);
+  const token = localStorage.getItem('accessToken');
 
 
     const handleData = async (id) => {
-    try {
-      const res = await instance.get(`/api/recipe/details?recipeId=${id}`);
+      if(!logged){
+        navigate('/SignIn')
+      }
+    else{
+      try {
+      const res = await axios.get(`http://localhost:5000/api/recipe/details?recipeId=${id}`,{
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+});
       setFoodDetail(res.data.data); // assuming { success: true, data: {...recipe} }
       console.log(res.data.data)
       setClose(true);
     } catch (err) {
       console.error('Error fetching recipe details:', err);
     }
+    }
   };
  
 
  const handleAdd = async (id) => {
   try {
-    const res = await instance.post('/api/recipe/private/saved', { recipeId: id });
+    const res = await axios.post('http://localhost:5000/api/recipe/private/saved', { recipeId: id },{
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+});
     console.log('Recipe added successfully:', res.data);
     // Optional: Show success message, update UI, etc.
   } catch (err) {
@@ -46,6 +61,7 @@ const ViewProvider = ({ children }) => {
 const handleLogout = () => {
     // setUserName(''); // Clear user name (or other user data)
     localStorage.clear();
+    setProfilepic(null);
     setLogged(false);
     navigate('/', { replace: true });
     window.location.reload();
@@ -58,26 +74,17 @@ const handleLogout = () => {
 
 
 
-
   const allValue = { 
-//   fetchSearch, 
-//   Favourite,
-//   FetchSavedRecipe, 
-//   Recipe, 
-//   item,
   handleAdd, 
-//   handleRemove, 
   handleData, 
   foodDetail, 
   onClose,
   close,
   favourites, 
   setFavourites,
-//   UserName,
-//   handleprofile,
-//   userProfile,
-//   userDate,
-//   userTime,
+  token,
+  profilepic,
+  setProfilepic,
 addedRecipes,
 setAddedRecipes,
   logged,

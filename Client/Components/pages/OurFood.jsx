@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import instance from '../utils/axios';
+import axios from 'axios';
 import { useViewContext } from '../Context/Context_view';
 import FoodData from '../FoodData';
 
@@ -10,7 +11,8 @@ const OurFood = () => {
     close,
     addedRecipes,
     setAddedRecipes,
-    logged
+    logged,
+    token
   } = useViewContext();
 
   const [recipes, setRecipes] = useState([]);
@@ -42,14 +44,14 @@ const OurFood = () => {
     setLoading(true);
     try {
       const endpoint = logged
-        ? `/api/recipe/private?page=${pageNum}&search=${search}&limit=${LIMIT}`
-        : `/api/recipe/public?page=${pageNum}&search=${search}&limit=${LIMIT}`;
+        ? `http://localhost:5000/api/recipe/private?page=${pageNum}&search=${search}&limit=${LIMIT}`
+        : `http://localhost:5000/api/recipe/public?page=${pageNum}&search=${search}&limit=${LIMIT}`;
 
-      const res = await instance.get(endpoint, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      });
+      const res = await axios.get(endpoint, {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+});
 
       const data = res.data.data || [];
 
