@@ -134,7 +134,7 @@ const OurFood = () => {
               />
               <div className='flex flex-col items-center py-2 px-4'>
                 <p className='text-[20px] line-clamp-1'>{item.name}</p>
-                <p className='text-blue-500 mt-2'>{item.prepTime}min</p>
+                <p className='text-blue-500 mt-2'>{item.prepTime}in</p>
 
                 <div className='flex'>
                   {logged && (
