@@ -1,6 +1,7 @@
 import {
   getCustomerProfileService,
   updateCustomerProfileService,
+  deleteCustomerProfileService
 } from '../services/customerService.js';
 
 export const getCustomerProfile = async (req, res) => {
@@ -32,3 +33,13 @@ export const updateCustomerProfile = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+export const deleteCustomerProfile = async (req, res) => {
+  try {
+    await deleteCustomerProfileService(req.user.id);
+    res.json({ message: 'Account deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+

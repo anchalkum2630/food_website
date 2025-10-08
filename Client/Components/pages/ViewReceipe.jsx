@@ -95,7 +95,7 @@ const ViewReceipe = () => {
         {favourites.map((item) => (
           <div key={item.id} className='justify-center group'>
             <img
-              src={item.imageUrl}
+              src="https://i.pinimg.com/736x/53/43/97/534397daa7e7644ce809651013a40b23.jpg"
               alt={item.name}
               className='w-full h-48 rounded-lg image-resize transform transition-transform duration-300 group-hover:scale-110'
             />

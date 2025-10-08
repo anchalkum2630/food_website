@@ -128,7 +128,7 @@ const OurFood = () => {
               className='group'
             >
               <img
-                src={item.imageUrl}
+                src="https://i.pinimg.com/736x/53/43/97/534397daa7e7644ce809651013a40b23.jpg"
                 alt={item.name}
                 className='w-[90%] h-48 mx-auto rounded-lg transform transition-transform duration-300 group-hover:scale-110'
               />

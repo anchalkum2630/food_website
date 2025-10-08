@@ -48,3 +48,21 @@ export const updateCustomerProfileService = async (userId, data) => {
 
   return updatedUser;
 };
+
+export const deleteCustomerProfileService = async (userId) => {
+  const user = await prisma.User.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  await prisma.User.delete({
+    where: { id: userId },
+  });
+
+  return { message: 'User account deleted successfully' };
+};
+
+

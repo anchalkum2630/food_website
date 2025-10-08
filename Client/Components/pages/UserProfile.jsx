@@ -49,7 +49,7 @@ const UserProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [errors, setErrors] = useState({});
   const [selectedImage, setSelectedImage] = useState(null);
-  const { token,setProfilepic} = useViewContext();
+  const { token,setProfilepic,handleLogout} = useViewContext();
 
   useEffect(() => {
   axios.get("http://localhost:5000/api/customer/profile", {
@@ -115,6 +115,23 @@ const UserProfile = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+  if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) return;
+
+  try {
+    console.log("yes")
+    await axios.delete("http://localhost:5000/api/customer/profile", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    alert("Your account has been deleted successfully.");
+    handleLogout();
+  } catch (error) {
+    console.error("Error deleting account", error);
+    alert("Failed to delete account");
+  }
+};
+
+
   const handleChange = (e, fieldName) => {
     const { value } = e.target;
     setUser(prev => ({ ...prev, [fieldName]: value }));
@@ -175,6 +192,11 @@ const UserProfile = () => {
             <Detail label="Pincode" value={user.addressPincode} Icon={FaHashtag} fieldName="addressPincode" editable={isEditing} onChange={handleChange} error={errors.addressPincode} />
             <Detail label="Address" value={user.address} Icon={FaMapMarkerAlt} fieldName="address" editable={isEditing} onChange={handleChange} error={errors.address} />
             <Detail label="Joined On" value={formattedDate} Icon={FaCalendarAlt} fieldName="createdAt" editable={false} />
+          </div>
+          <div className="flex justify-center mt-8">
+            <button onClick={handleDeleteAccount} className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg text-base font-semibold shadow-md">
+              Delete Account
+            </button>
           </div>
         </div>
       </div>

@@ -27,7 +27,7 @@ const FoodData = () => {
           <div className='overflow-y-scroll scrollbar-hide h-full'>
             <div key={foodDetail.id} className='justify-center p-4'>
               <ImCross className='text-red-600 ml-auto cursor-pointer' onClick={onClose} />
-              <img src={foodDetail.imageUrl} alt={foodDetail.name} className='sm:w-[50%] h-48 rounded-lg image-resize mx-auto' />
+              <img src="https://i.pinimg.com/736x/53/43/97/534397daa7e7644ce809651013a40b23.jpg" alt={foodDetail.name} className='sm:w-[50%] h-48 rounded-lg image-resize mx-auto' />
               <div className='flex justify-center py-2 px-4 flex-col items-center'>
                 <p className='text-[20px]'><u>{foodDetail.name}</u></p>
                 <p className='text-blue-500 mt-2'>{foodDetail.prepTime}in</p>
