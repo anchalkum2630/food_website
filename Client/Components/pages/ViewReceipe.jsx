@@ -1,78 +1,235 @@
+// import React, { useEffect, useState } from 'react';
+// import { useNavigate } from 'react-router-dom';
+// // import instance from '../utils/axios';
+// import axios from 'axios';
+// import { useViewContext } from '../Context/Context_view.jsx';
+// import { FaWhatsapp } from 'react-icons/fa'; // Import the WhatsApp icon
+// import FoodData from '../FoodData';
+
+// const ViewReceipe = () => {
+//   const { close, handleData, logged, addedRecipes, setAddedRecipes, favourites, setFavourites ,token} = useViewContext();
+//   const navigate = useNavigate();
+
+//   // Redirect if not logged in
+//   useEffect(() => {
+//     if (!logged) {
+//       navigate('/');
+//     }
+//   }, [logged, navigate]);
+
+//   // Fetch saved recipes
+//   useEffect(() => {
+//     const fetchFavourites = async () => {
+//       try {
+//         const res = await axios.get(`http://localhost:5000/api/recipe/private/saved`,{
+//   headers: {
+//     Authorization: `Bearer ${token}`
+//   }
+// });
+//         setFavourites(res.data.data);
+//         console.log(res.data);
+//       } catch (err) {
+//         console.error('Failed to fetch recipes:', err);
+//       }
+//     };
+
+//     if (logged) {
+//       fetchFavourites();
+//     }
+//   }, [logged]);
+
+//   // Remove recipe
+//   const handleRemove = async (id) => {
+//     try {
+//       const res = await axios.delete('http://localhost:5000/api/recipe/private/saved', {
+        
+//   headers: {
+//     Authorization: `Bearer ${token}`
+//   },
+
+//         data: { recipeId: id },
+//         withCredentials: true
+//       });
+//       console.log(res.data);
+
+//       // Update favourites
+//       setFavourites(prev => prev.filter(item => item.id !== id));
+
+//       // Also update addedRecipe from context
+//       setAddedRecipes(prev => prev.filter(recipeId => recipeId !== id));
+//     } catch (err) {
+//       console.error('Error removing recipe:', err);
+//     }
+//   };
+
+//   if (!favourites || favourites.length === 0) {
+//     return (
+//       <p className='w-[90%] mx-auto mt-44 mb-48 text-center text-3xl'>
+//         No recipes found.
+//       </p>
+//     );
+//   }
+
+//   const shareRecipeViaWhatsApp = (recipe) => {
+//     // const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients.join(', ') : 'Ingredients not available';
+
+//     const message = `Check out this recipe!\n\n
+//     Name: ${recipe.name}\n
+//     Course: ${recipe.course}\n
+//     Cuisine: ${recipe.cuisine}\n
+//     Description: ${recipe.description}\n
+//     Ingredients: ${recipe.ingredients}\n
+//     Prep Time: ${recipe.prepTime}\n
+//     Diet: ${recipe.diet}\n\n
+//     Instructions: ${recipe.instruction}`;
+
+//     const encodedMessage = encodeURIComponent(message);
+//     const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+    
+//     window.open(whatsappUrl, '_blank');
+//   };
+
+//   // Add this inside your component, above the return statement
+// const handleOrderAll = async () => {
+//   try {
+//     if (!favourites || favourites.length === 0) {
+//       alert("No recipes to order!");
+//       return;
+//     }
+
+//     // Prepare the data to send — list of recipe IDs
+//     const recipeIds = favourites.map(item => item.id);
+
+//     const res = await axios.post(
+//       'http://localhost:5000/api/order', // your backend endpoint for ordering
+//       { recipeIds }, // payload
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       }
+//     );
+
+//     console.log(res.data);
+//     alert("Order placed successfully!");
+    
+//     // Optional: clear favourites if ordering means consuming them
+//     // setFavourites([]);
+//   } catch (err) {
+//     console.error("Error placing order:", err);
+//     alert("Failed to place order. Please try again.");
+//   }
+// };
+
+
+//   return (
+//   <div className='w-[90%] mx-auto mt-24 mb-24'>
+//     {/* Green Order Food button on top-right */}
+//     <div className='flex justify-end mb-6'>
+//       <button
+//         onClick={handleOrderAll} // function to handle ordering all or showing order modal
+//         className='bg-green-600 text-white py-2 px-6 rounded-md text-lg hover:bg-green-500'
+//       >
+//         Order Food
+//       </button>
+//     </div>
+
+//     <div className='grid sm:grid-cols-2 lg:grid-cols-4 gap-12'>
+//       {favourites.map((item) => (
+//         <div key={item.id} className='justify-center group'>
+//           <img
+//             src="https://i.pinimg.com/736x/53/43/97/534397daa7e7644ce809651013a40b23.jpg"
+//             alt={item.name}
+//             className='w-full h-48 rounded-lg image-resize transform transition-transform duration-300 group-hover:scale-110'
+//           />
+//           <div className='flex justify-center py-2 px-4 flex-col items-center'>
+//             <p className='text-[20px] line-clamp-1'>{item.name}</p>
+//             <p className='text-blue-500'>{item.prepTime}in</p>
+//             <div className='flex'>
+//               <button
+//                 className='bg-black w-[100px] text-white rounded-md my-6 py-[10px] text-[15px] hover:text-yellow-500'
+//                 onClick={() => handleRemove(item.id)}
+//               >
+//                 Remove
+//               </button>
+//               <button
+//                 className='bg-black w-[100px] text-white rounded-md my-6 ml-4 py-[10px] text-[15px] hover:text-yellow-500'
+//                 onClick={() => handleData(item.id)}
+//               >
+//                 More
+//               </button>
+//               <button
+//                 onClick={() => shareRecipeViaWhatsApp(item)}
+//                 className="bg-green-600 w-[100px] text-white rounded-md my-6 ml-4 py-[10px] text-[15px] flex items-center justify-center hover:text-yellow-500"
+//               >
+//                 <FaWhatsapp className="mr-2 text-xl" /> Share
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       ))}
+//     </div>
+
+//     {close && <FoodData />}
+//   </div>
+// );
+
+// };
+
+// export default ViewReceipe;
+
+
+
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import instance from '../utils/axios';
 import axios from 'axios';
 import { useViewContext } from '../Context/Context_view.jsx';
-import { FaWhatsapp } from 'react-icons/fa'; // Import the WhatsApp icon
+import { FaWhatsapp } from 'react-icons/fa';
 import FoodData from '../FoodData';
 
 const ViewReceipe = () => {
-  const { close, handleData, logged, addedRecipes, setAddedRecipes, favourites, setFavourites ,token} = useViewContext();
+  const { close, handleData, logged,ordered, setOrdered, addedRecipes, setAddedRecipes, favourites, setFavourites ,token} = useViewContext();
   const navigate = useNavigate();
 
-  // Redirect if not logged in
+  // const [ordered, setOrdered] = useState(false); // track order status
+
   useEffect(() => {
     if (!logged) {
       navigate('/');
     }
   }, [logged, navigate]);
 
-  // Fetch saved recipes
   useEffect(() => {
     const fetchFavourites = async () => {
       try {
         const res = await axios.get(`http://localhost:5000/api/recipe/private/saved`,{
-  headers: {
-    Authorization: `Bearer ${token}`
-  }
-});
+          headers: { Authorization: `Bearer ${token}` }
+        });
         setFavourites(res.data.data);
-        console.log(res.data);
       } catch (err) {
         console.error('Failed to fetch recipes:', err);
       }
     };
 
-    if (logged) {
-      fetchFavourites();
-    }
+    if (logged) fetchFavourites();
   }, [logged]);
 
-  // Remove recipe
   const handleRemove = async (id) => {
     try {
       const res = await axios.delete('http://localhost:5000/api/recipe/private/saved', {
-        
-  headers: {
-    Authorization: `Bearer ${token}`
-  },
-
+        headers: { Authorization: `Bearer ${token}` },
         data: { recipeId: id },
         withCredentials: true
       });
-      console.log(res.data);
-
-      // Update favourites
       setFavourites(prev => prev.filter(item => item.id !== id));
-
-      // Also update addedRecipe from context
       setAddedRecipes(prev => prev.filter(recipeId => recipeId !== id));
     } catch (err) {
       console.error('Error removing recipe:', err);
     }
   };
 
-  if (!favourites || favourites.length === 0) {
-    return (
-      <p className='w-[90%] mx-auto mt-44 mb-48 text-center text-3xl'>
-        No recipes found.
-      </p>
-    );
-  }
-
   const shareRecipeViaWhatsApp = (recipe) => {
-    // const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients.join(', ') : 'Ingredients not available';
-
     const message = `Check out this recipe!\n\n
     Name: ${recipe.name}\n
     Course: ${recipe.course}\n
@@ -85,12 +242,63 @@ const ViewReceipe = () => {
 
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
-    
     window.open(whatsappUrl, '_blank');
   };
 
+  const handleOrderAll = async () => {
+  try {
+    if (!favourites || favourites.length === 0) {
+      alert("No recipes to order!");
+      return;
+    }
+
+    console.log("Token being sent:", token);
+
+    // Correct axios POST with empty body and proper headers
+    const res = await axios.post(
+      'http://localhost:5000/api/order/book',
+      {}, // empty body
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    console.log(res.data);
+    setOrdered(true); // update the state to reflect order
+    alert("Order placed successfully!");
+  } catch (err) {
+    console.error("Error placing order:", err);
+    alert("Failed to place order. Please try again.");
+  }
+};
+
+
+
+  if (!favourites || favourites.length === 0) {
+    return (
+      <p className='w-[90%] mx-auto mt-44 mb-48 text-center text-3xl'>
+        No recipes found.
+      </p>
+    );
+  }
+
   return (
     <div className='w-[90%] mx-auto mt-24 mb-24'>
+      {/* Green Order Food button on top-right */}
+      <div className='flex justify-end mb-6'>
+        <button
+          onClick={handleOrderAll}
+          disabled={ordered} // disable after order
+          className={`py-2 px-6 rounded-md text-lg ${
+            ordered ? 'bg-gray-400 text-white cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-500'
+          }`}
+        >
+          {ordered ? 'Ordered' : 'Order Food'}
+        </button>
+      </div>
+
       <div className='grid sm:grid-cols-2 lg:grid-cols-4 gap-12'>
         {favourites.map((item) => (
           <div key={item.id} className='justify-center group'>
@@ -133,3 +341,4 @@ const ViewReceipe = () => {
 };
 
 export default ViewReceipe;
+

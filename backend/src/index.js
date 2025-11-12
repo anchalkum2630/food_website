@@ -8,8 +8,8 @@ import session from 'express-session';
 import authRoutes from './routes/authRoutes.js';
 import customerRoutes from './routes/customerRoutes.js';
 import recipeRoutes from './routes/recipeRoutes.js';
-import './config/passportConfig.js'; // 🔥 THIS IS CRITICAL
-
+import orderRoutes from './routes/orderRoutes.js';
+import './config/passportConfig.js'; 
 dotenv.config();
 
 const app = express();
@@ -30,16 +30,12 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session())
-
 app.use('/api/auth',authRoutes);
 app.use('/api/customer',customerRoutes);
 app.use('/api/recipe',recipeRoutes);
-
-
-
+app.use('/api/order',orderRoutes);
 app.get('/', (req, res) => {
   res.send('YumRecipe backend is running..!');
 });
-
 const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

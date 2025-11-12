@@ -18,6 +18,7 @@ const ViewProvider = ({ children }) => {
   const [favourites, setFavourites] = useState([]);
   const [profilepic,setProfilepic] = useState(null);
   const token = localStorage.getItem('accessToken');
+  const [ordered, setOrdered] = useState(false);
 
 
     const handleData = async (id) => {
@@ -89,7 +90,9 @@ addedRecipes,
 setAddedRecipes,
   logged,
   setLogged,
-  handleLogout};
+  handleLogout,
+  ordered, 
+  setOrdered};
 
   return (
     <viewContext.Provider value={allValue}>

@@ -43,4 +43,4 @@ const hashPassword = async (password) => {
   return bcrypt.hash(password, salt);
 };
 
-export { generateOTP, sendOTP, verifyOTP, hashPassword };
+export { generateOTP, sendOTP, verifyOTP, hashPassword,transporter };
